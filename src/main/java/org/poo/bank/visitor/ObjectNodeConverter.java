@@ -3,10 +3,13 @@ package org.poo.bank.visitor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.poo.bank.entity.Transaction;
+import org.poo.bank.entity.transaction.CreateAccountTransaction;
+import org.poo.bank.entity.transaction.CreateCardTransaction;
+import org.poo.bank.entity.transaction.DeleteCardTransaction;
+import org.poo.bank.entity.transaction.Transaction;
 import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
-import org.poo.bank.entity.account.Card;
+import org.poo.bank.entity.account.card.Card;
 
 public class ObjectNodeConverter implements ObjectNodeVisitor {
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -33,7 +36,12 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
 
     @Override
     public ObjectNode toObjectNode(Transaction transaction) {
-        return null;
+        ObjectNode objectNode = mapper.createObjectNode();
+
+        objectNode.put("timestamp", transaction.getTimestamp());
+        objectNode.put("description", transaction.getDescription());
+
+        return objectNode;
     }
 
     @Override
@@ -64,8 +72,23 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         ObjectNode objectNode = mapper.createObjectNode();
 
         objectNode.put("cardNumber", card.getCardNumber());
-        objectNode.put("status", card.getStatus());
+        objectNode.put("status", card.getStatus().getValue());
 
         return objectNode;
+    }
+
+    @Override
+    public ObjectNode toObjectNode(CreateAccountTransaction transaction) {
+        return toObjectNode((Transaction) transaction);
+    }
+
+    @Override
+    public ObjectNode toObjectNode(CreateCardTransaction transaction) {
+        return toObjectNode((Transaction) transaction);
+    }
+
+    @Override
+    public ObjectNode toObjectNode(DeleteCardTransaction transaction) {
+        return toObjectNode((Transaction) transaction);
     }
 }

@@ -1,4 +1,4 @@
-package org.poo.bank.singleton;
+package org.poo.bank;
 
 import org.poo.bank.Bank;
 

@@ -10,10 +10,10 @@ import org.poo.bank.visitor.ObjectNodeVisitor;
 import org.poo.fileio.CommandInput;
 
 public class PrintUsersAction extends Action {
-    private static final ObjectMapper mapper = new ObjectMapper();
     private static final ObjectNodeVisitor objectNodeConverter = new ObjectNodeConverter();
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
+        ObjectMapper mapper = getMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         ArrayNode arrayNode = mapper.createArrayNode();
 

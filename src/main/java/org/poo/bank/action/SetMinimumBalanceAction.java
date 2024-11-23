@@ -5,7 +5,7 @@ import org.poo.bank.Bank;
 import org.poo.bank.entity.account.Account;
 import org.poo.fileio.CommandInput;
 
-public class AddFundAction extends Action {
+public class SetMinimumBalanceAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
         try {
@@ -14,8 +14,7 @@ public class AddFundAction extends Action {
             if (account == null)
                 throw new RuntimeException("User not found");
 
-            Double balance = account.getBalance();
-            account.setBalance(balance + commandInput.getAmount());
+            account.setMinimumBalance(commandInput.getMinBalance());
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

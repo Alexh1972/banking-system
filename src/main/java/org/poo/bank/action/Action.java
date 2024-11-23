@@ -1,10 +1,13 @@
 package org.poo.bank.action;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
+import org.poo.bank.entity.account.card.CardType;
 import org.poo.fileio.CommandInput;
 
 public abstract class Action {
+    private static final ObjectMapper mapper = new ObjectMapper();
     public abstract ObjectNode execute(Bank bank, CommandInput commandInput);
 
     public static Action toAction(String action) {
@@ -12,8 +15,28 @@ public abstract class Action {
                 case "printUsers" ->  new PrintUsersAction();
                 case "addAccount" -> new AddAccountAction();
                 case "addFunds" -> new AddFundAction();
-                case "createCard" -> new CreateCardAction();
-                default -> throw new IllegalStateException("Unexpected action value: " + action);
+                case "createCard" -> new CreateCardAction(CardType.CARD_TYPE_GENERAL);
+                case "createOneTimeCard" -> new CreateCardAction(CardType.CARD_TYPE_ONE_TIME);
+                case "deleteAccount" -> new DeleteAccountAction();
+                case "deleteCard" -> new DeleteCardAction();
+                case "checkCardStatus" -> new CheckCardStatusAction();
+                case "payOnline" -> new CardPaymentAction();
+                default -> throw new IllegalArgumentException("Unexpected action value: " + action);
             };
+    }
+
+    public ObjectNode executeError(String message, int timestamp) {
+        ObjectNode objectNode = mapper.createObjectNode();
+        ObjectNode detailNode = mapper.createObjectNode();
+
+        detailNode.put("description", message);
+        detailNode.put("timestamp", timestamp);
+
+        objectNode.put("output", detailNode);
+        return objectNode;
+    }
+
+    protected ObjectMapper getMapper() {
+        return mapper;
     }
 }

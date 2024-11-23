@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
 import org.poo.bank.action.Action;
-import org.poo.bank.singleton.BankSingleton;
+import org.poo.bank.BankSingleton;
 import org.poo.checker.Checker;
 import org.poo.checker.CheckerConstants;
 import org.poo.fileio.CommandInput;
@@ -60,7 +60,7 @@ public final class Main {
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-                if (i == 0)
+                if (i == 2)
                     action(file.getName(), filepath);
             }
             i++;

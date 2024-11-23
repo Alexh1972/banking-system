@@ -13,22 +13,25 @@ import java.util.ArrayList;
 public class AddAccountAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
-        User user = bank.getUsers().stream().filter(u -> u.getEmail().equals(commandInput.getEmail())).toList().getFirst();
+        try {
+            User user = bank.getUser(commandInput.getEmail());
 
-        if (user == null)
-            throw new RuntimeException("User with email '" + commandInput.getEmail() + "' not found");
+            if (user == null)
+                throw new RuntimeException("User not found");
 
-        Account account = Account.builder()
-                .currency(commandInput.getCurrency())
-                .accountType(AccountType.getAccountType(commandInput.getAccountType()))
-                .interestRate(commandInput.getInterestRate())
-                .IBAN(Utils.generateIBAN())
-                .balance(0.0)
-                .cards(new ArrayList<>())
-                .build();
+            Account account = Account.builder()
+                    .currency(commandInput.getCurrency())
+                    .accountType(AccountType.getAccountType(commandInput.getAccountType()))
+                    .interestRate(commandInput.getInterestRate())
+                    .IBAN(Utils.generateIBAN())
+                    .balance(0.0)
+                    .cards(new ArrayList<>())
+                    .build();
 
-        user.getAccounts().add(account);
-        bank.getAccountIBANMap().put(account.getIBAN(), account);
+            bank.addAccount(account, user);
+        } catch (RuntimeException e) {
+            return executeError(e.getMessage(), commandInput.getTimestamp());
+        }
 
         return null;
     }
