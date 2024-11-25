@@ -11,6 +11,7 @@ import org.poo.checker.Checker;
 import org.poo.checker.CheckerConstants;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.ObjectInput;
+import org.poo.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +61,7 @@ public final class Main {
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-                if (i == 2)
+                if (i == 5)
                     action(file.getName(), filepath);
             }
             i++;
@@ -100,6 +101,8 @@ public final class Main {
                 System.out.println(e.getMessage());
             }
         }
+
+        Utils.resetRandom();
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);

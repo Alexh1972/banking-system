@@ -5,6 +5,9 @@ import org.poo.bank.Bank;
 import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.AccountType;
+import org.poo.bank.entity.transaction.CreateAccountTransaction;
+import org.poo.bank.entity.transaction.Transaction;
+import org.poo.bank.notification.TransactionNotifier;
 import org.poo.fileio.CommandInput;
 import org.poo.utils.Utils;
 
@@ -25,10 +28,12 @@ public class AddAccountAction extends Action {
                     .interestRate(commandInput.getInterestRate())
                     .IBAN(Utils.generateIBAN())
                     .balance(0.0)
+                    .minimumBalance(0.0)
                     .cards(new ArrayList<>())
                     .build();
 
             bank.addAccount(account, user);
+            TransactionNotifier.notify(new CreateAccountTransaction(commandInput.getTimestamp()), user);
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

@@ -10,6 +10,9 @@ public class DeleteAccountAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
         try {
+            if (commandInput.getEmail() == null)
+                throw new RuntimeException("User not found");
+
             Account account = bank.getAccount(commandInput.getAccount());
 
             if (account == null)
@@ -17,7 +20,7 @@ public class DeleteAccountAction extends Action {
 
             User user = bank.getUser(account);
 
-            if (user == null)
+            if (user == null || !user.equals(bank.getUser(commandInput.getEmail())))
                 throw new RuntimeException("User not found");
 
             if (account.getBalance() == 0)

@@ -12,7 +12,7 @@ public abstract class Action {
 
     public static Action toAction(String action) {
         return switch (action) {
-                case "printUsers" ->  new PrintUsersAction();
+                case "printUsers" ->  new GetUsersAction();
                 case "addAccount" -> new AddAccountAction();
                 case "addFunds" -> new AddFundAction();
                 case "createCard" -> new CreateCardAction(CardType.CARD_TYPE_GENERAL);
@@ -21,6 +21,8 @@ public abstract class Action {
                 case "deleteCard" -> new DeleteCardAction();
                 case "checkCardStatus" -> new CheckCardStatusAction();
                 case "payOnline" -> new CardPaymentAction();
+                case "setMinimumBalance" -> new SetMinimumBalanceAction();
+                case "printTransactions" -> new GetTransactionsAction();
                 default -> throw new IllegalArgumentException("Unexpected action value: " + action);
             };
     }

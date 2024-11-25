@@ -1,11 +1,11 @@
-package org.poo.bank.entity;
+package org.poo.bank;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ExchangeValue {
+public class ExchangeRate {
     private String to;
     private String from;
     private Double rate;

@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CardStatus {
-    CARD_STATUS_ACTIVE("active"), CARD_STATUS_FROZEN("frozen"), CARD_STATUS("warning");
+    CARD_STATUS_ACTIVE("active"), CARD_STATUS_FROZEN("frozen"), CARD_STATUS_WARNING("warning");
 
     private final String value;
 

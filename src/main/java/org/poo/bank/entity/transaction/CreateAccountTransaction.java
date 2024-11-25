@@ -4,6 +4,6 @@ import lombok.Data;
 
 public class CreateAccountTransaction extends Transaction {
     public CreateAccountTransaction(Integer timestamp) {
-        super("New account created", timestamp);
+        super(TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_CREATED.getValue(), timestamp);
     }
 }

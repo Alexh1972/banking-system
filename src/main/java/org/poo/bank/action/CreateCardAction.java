@@ -7,6 +7,9 @@ import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;
 import org.poo.bank.entity.account.card.CardType;
+import org.poo.bank.entity.transaction.CreateCardTransaction;
+import org.poo.bank.entity.transaction.TransactionMessage;
+import org.poo.bank.notification.TransactionNotifier;
 import org.poo.fileio.CommandInput;
 import org.poo.utils.Utils;
 
@@ -25,17 +28,24 @@ public class CreateCardAction extends Action {
 
             Account account = bank.getAccount(commandInput.getAccount());
 
-            if (account == null)
+            if (account == null) {
+                TransactionNotifier.notify(
+                        new CreateCardTransaction(
+                                TransactionMessage.TRANSACTION_MESSAGE_CARD_DELETED_ERROR_OWNER,
+                                commandInput.getTimestamp()),
+                        user);
                 throw new RuntimeException("User not found");
+            }
 
             Card card = Card.builder()
                     .cardNumber(Utils.generateCardNumber())
-                    .status(CardStatus.getCardStatus("active"))
+                    .status(CardStatus.CARD_STATUS_ACTIVE)
                     .type(cardType)
-                    .owner(user)
+                    .ownerEmail(user.getEmail())
                     .build();
 
             bank.addCard(account, card);
+            TransactionNotifier.notify(new CreateCardTransaction(commandInput.getTimestamp()), user);
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }
