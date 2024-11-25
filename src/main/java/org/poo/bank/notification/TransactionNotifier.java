@@ -22,13 +22,10 @@ public class TransactionNotifier {
 
     public static void notify(Transaction transaction, User user) {
         user.transactionUpdate(transaction);
-        BankSingleton.getInstance().addTransaction(transaction);
     }
     public void notifyUsers(Transaction transaction) {
         for (User user : notifiedUsers) {
             user.transactionUpdate(transaction);
         }
-
-        BankSingleton.getInstance().addTransaction(transaction);
     }
 }

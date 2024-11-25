@@ -23,16 +23,31 @@ public class Account implements ObjectNodeAcceptor {
     private Double interestRate;
     private Double minimumBalance;
 
-    public void subtractBalance(Double subtraction, Card card) {
-        if (balance - subtraction >= 0) {
-            balance -= subtraction;
-
+    public boolean subtractBalance(Double subtraction, Card card) {
+        if (subtractBalance(subtraction)) {
             if (balance <= minimumBalance) {
                 card.setStatus(CardStatus.CARD_STATUS_FROZEN);
             } else if (balance - minimumBalance <= WARNING_BALANCE_THRESHOLD) {
                 card.setStatus(CardStatus.CARD_STATUS_WARNING);
             }
+
+            return true;
         }
+
+        return false;
+    }
+
+    public boolean subtractBalance(Double subtraction) {
+        if (balance - subtraction >= 0) {
+            balance -= subtraction;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void addBalance(Double addition) {
+        balance += addition;
     }
 
     @Override

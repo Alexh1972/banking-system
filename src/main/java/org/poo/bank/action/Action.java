@@ -23,6 +23,8 @@ public abstract class Action {
                 case "payOnline" -> new CardPaymentAction();
                 case "setMinimumBalance" -> new SetMinimumBalanceAction();
                 case "printTransactions" -> new GetTransactionsAction();
+                case "sendMoney" -> new SendMoneyAction();
+                case "setAlias" -> new SetAliasAction();
                 default -> throw new IllegalArgumentException("Unexpected action value: " + action);
             };
     }

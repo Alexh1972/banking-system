@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.poo.bank.entity.Alias;
 import org.poo.bank.entity.transaction.Transaction;
 import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
@@ -23,23 +24,23 @@ import java.util.Map;
 public class Bank {
     private static final String DELIMITER = "$";
     private List <User> users;
-    private List<Transaction> transactions;
     private Map<String, Account> accountIBANMap;
     private Map<String, User> userEmailMap;
     private Map<Account, User> userAccountMap;
     private Map<String, Card> cardNumberMap;
     private Map<Card, Account> accountCardMap;
     private Map<String, Double> exchangeRates;
+    private Map<Alias, String> aliasMap;
 
     public void initialize(ObjectInput objectInput) {
         users = new ArrayList<>();
-        transactions = new ArrayList<>();
         accountIBANMap = new HashMap<>();
         userEmailMap = new HashMap<>();
         userAccountMap = new HashMap<>();
         cardNumberMap = new HashMap<>();
         accountCardMap = new HashMap<>();
         exchangeRates = new HashMap<>();
+        aliasMap = new HashMap<>();
 
         for (UserInput userInput : objectInput.getUsers()) {
             User user = new User(userInput.getFirstName(), userInput.getLastName(), userInput.getEmail());
@@ -58,7 +59,7 @@ public class Bank {
 
     private void combineRates(List<ExchangeRate> rates) {
         for (ExchangeRate exchangeRate : rates) {
-            exchangeRates.put(exchangeRate.getTo() + DELIMITER + exchangeRate.getFrom(), exchangeRate.getRate());
+            exchangeRates.put(exchangeRate.getFrom() + DELIMITER + exchangeRate.getTo(), exchangeRate.getRate());
         }
 
         boolean changed = true;
@@ -91,6 +92,20 @@ public class Bank {
 
     public Account getAccount(String account) {
         return accountIBANMap.get(account);
+    }
+
+    public Account getAccount(String email, String aliasName) {
+        Alias alias = new Alias(aliasName, email);
+        String account = aliasMap.get(alias);
+
+        if (account == null)
+            account = aliasName;
+
+        return getAccount(account);
+    }
+    public void setAlias(String user, String aliasName, String IBAN) {
+        Alias alias = new Alias(aliasName, user);
+        aliasMap.put(alias, IBAN);
     }
 
     public User getUser(String email) {
@@ -145,7 +160,7 @@ public class Bank {
     }
 
     public Double getRate(String from, String to) {
-        return exchangeRates.get(to + DELIMITER + from);
+        return exchangeRates.get(from + DELIMITER + to);
     }
 
     public Double getAmount(Double amount, String from, String to) {
@@ -162,9 +177,5 @@ public class Bank {
         }
 
         return null;
-    }
-
-    public void addTransaction(Transaction transaction) {
-        transactions.add(transaction);
     }
 }

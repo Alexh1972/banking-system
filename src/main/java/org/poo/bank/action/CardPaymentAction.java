@@ -5,6 +5,8 @@ import org.poo.bank.Bank;
 import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
+import org.poo.bank.entity.transaction.InsufficientFundsTransaction;
+import org.poo.bank.notification.TransactionNotifier;
 import org.poo.fileio.CommandInput;
 
 public class CardPaymentAction extends Action {
@@ -29,14 +31,13 @@ public class CardPaymentAction extends Action {
                     commandInput.getCurrency(),
                     account.getCurrency());
 
-            if (amountSpent > account.getBalance()) {
-                // transaction
-            } else {
-                account.subtractBalance(amountSpent, card);
+            if (!account.subtractBalance(amountSpent, card)) {
+                TransactionNotifier.notify(new InsufficientFundsTransaction(commandInput.getTimestamp()), bank.getUser(account));
             }
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }
+
         return null;
     }
 }

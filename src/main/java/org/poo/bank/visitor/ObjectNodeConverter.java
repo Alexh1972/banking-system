@@ -3,10 +3,7 @@ package org.poo.bank.visitor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.poo.bank.entity.transaction.CreateAccountTransaction;
-import org.poo.bank.entity.transaction.CreateCardTransaction;
-import org.poo.bank.entity.transaction.DeleteCardTransaction;
-import org.poo.bank.entity.transaction.Transaction;
+import org.poo.bank.entity.transaction.*;
 import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
@@ -90,5 +87,20 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     @Override
     public ObjectNode toObjectNode(DeleteCardTransaction transaction) {
         return toObjectNode((Transaction) transaction);
+    }
+
+    @Override
+    public ObjectNode toObjectNode(InsufficientFundsTransaction transaction) {
+        return toObjectNode((Transaction) transaction);
+    }
+
+    @Override
+    public ObjectNode toObjectNode(SendMoneyTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+        objectNode.put("amount", transaction.getAmount());
+        objectNode.put("receiverIBAN", transaction.getReceiverIBAN());
+        objectNode.put("senderIBAN", transaction.getSenderIBAN());
+        objectNode.put("transferType", transaction.getTransferType().getValue());
+        return objectNode;
     }
 }
