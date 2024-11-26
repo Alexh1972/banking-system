@@ -81,7 +81,13 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
 
     @Override
     public ObjectNode toObjectNode(CreateCardTransaction transaction) {
-        return toObjectNode((Transaction) transaction);
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+
+        objectNode.put("account", transaction.getAccount());
+        objectNode.put("card", transaction.getCard());
+        objectNode.put("cardHolder", transaction.getCardHolder());
+
+        return objectNode;
     }
 
     @Override

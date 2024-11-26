@@ -11,6 +11,10 @@ public class CheckCardStatusAction extends Action {
         try {
             Card card = bank.getCard(commandInput.getCardNumber());
 
+            if (card == null)
+                throw new RuntimeException("Card not found");
+
+
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

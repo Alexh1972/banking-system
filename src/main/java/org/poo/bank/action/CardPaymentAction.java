@@ -6,6 +6,7 @@ import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.transaction.InsufficientFundsTransaction;
+import org.poo.bank.entity.transaction.TransferType;
 import org.poo.bank.notification.TransactionNotifier;
 import org.poo.fileio.CommandInput;
 
@@ -31,8 +32,10 @@ public class CardPaymentAction extends Action {
                     commandInput.getCurrency(),
                     account.getCurrency());
 
-            if (!account.subtractBalance(amountSpent, card)) {
-                TransactionNotifier.notify(new InsufficientFundsTransaction(commandInput.getTimestamp()), bank.getUser(account));
+            TransferType transferResult = account.subtractBalance(amountSpent, card);
+            switch (transferResult) {
+                case TRANSFER_TYPE_INSUFFICIENT_FUNDS -> TransactionNotifier.notify(new InsufficientFundsTransaction(commandInput.getTimestamp()), bank.getUser(account));
+                //case TRANSFER_TYPE_FROZEN_CARD ->
             }
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());

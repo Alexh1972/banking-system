@@ -61,10 +61,10 @@ public final class Main {
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-                if (i == 7) {
+//                if (i == 8) {
                  System.out.println(filepath);
                     action(file.getName(), filepath);
-                }
+//                }
             }
             i++;
         }
@@ -94,7 +94,9 @@ public final class Main {
                 ObjectNode objectNode = action.execute(bank, commandInput);
 
                 if (objectNode != null) {
-                    objectNode.put("command", commandInput.getCommand());
+                    if (!objectNode.has("success") && !objectNode.has("error")) {
+                        objectNode.put("command", commandInput.getCommand());
+                    }
                     objectNode.put("timestamp", commandInput.getTimestamp());
 
                     output.add(objectNode);

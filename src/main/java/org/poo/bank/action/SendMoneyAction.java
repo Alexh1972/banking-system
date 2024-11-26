@@ -27,6 +27,17 @@ public class SendMoneyAction extends Action {
             Double amount = bank.getAmount(commandInput.getAmount(), sender.getCurrency(), receiver.getCurrency());
             if (sender.subtractBalance(commandInput.getAmount())) {
                 receiver.addBalance(amount);
+
+                if (receiver.getIBAN().equals(sender.getIBAN()))
+                    TransactionNotifier.notify(new SendMoneyTransaction(
+                                    commandInput.getDescription(),
+                                    commandInput.getTimestamp(),
+                                    amount,
+                                    receiver.getCurrency(),
+                                    receiver.getIBAN(),
+                                    sender.getIBAN(),
+                                    TransferType.TRANSFER_TYPE_RECEIVED),
+                            receiverUser);
                 TransactionNotifier.notify(new SendMoneyTransaction(
                                 commandInput.getDescription(),
                                 commandInput.getTimestamp(),
@@ -36,15 +47,16 @@ public class SendMoneyAction extends Action {
                                 sender.getIBAN(),
                                 TransferType.TRANSFER_TYPE_SENT),
                         senderUser);
-                TransactionNotifier.notify(new SendMoneyTransaction(
-                                commandInput.getDescription(),
-                                commandInput.getTimestamp(),
-                                amount,
-                                receiver.getCurrency(),
-                                receiver.getIBAN(),
-                                sender.getIBAN(),
-                                TransferType.TRANSFER_TYPE_RECEIVED),
-                        receiverUser);
+                if (!receiver.getIBAN().equals(sender.getIBAN()))
+                    TransactionNotifier.notify(new SendMoneyTransaction(
+                                    commandInput.getDescription(),
+                                    commandInput.getTimestamp(),
+                                    amount,
+                                    receiver.getCurrency(),
+                                    receiver.getIBAN(),
+                                    sender.getIBAN(),
+                                    TransferType.TRANSFER_TYPE_RECEIVED),
+                            receiverUser);
             } else {
                 TransactionNotifier.notify(new InsufficientFundsTransaction(commandInput.getTimestamp()), senderUser);
             }

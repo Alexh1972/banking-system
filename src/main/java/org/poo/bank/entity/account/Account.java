@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;
+import org.poo.bank.entity.account.card.CardType;
+import org.poo.bank.entity.transaction.TransferType;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
@@ -23,18 +25,26 @@ public class Account implements ObjectNodeAcceptor {
     private Double interestRate;
     private Double minimumBalance;
 
-    public boolean subtractBalance(Double subtraction, Card card) {
-        if (subtractBalance(subtraction)) {
-            if (balance <= minimumBalance) {
-                card.setStatus(CardStatus.CARD_STATUS_FROZEN);
-            } else if (balance - minimumBalance <= WARNING_BALANCE_THRESHOLD) {
-                card.setStatus(CardStatus.CARD_STATUS_WARNING);
-            }
-
-            return true;
+    public TransferType subtractBalance(Double subtraction, Card card) {
+        if (card.getType().equals(CardType.CARD_TYPE_ONE_TIME)) {
+            card.setStatus(CardStatus.CARD_STATUS_FROZEN);
         }
 
-        return false;
+        if (card.getStatus() != CardStatus.CARD_STATUS_FROZEN) {
+            if (subtractBalance(subtraction)) {
+                if (balance <= minimumBalance) {
+                    card.setStatus(CardStatus.CARD_STATUS_FROZEN);
+                } else if (balance - minimumBalance <= WARNING_BALANCE_THRESHOLD) {
+                    card.setStatus(CardStatus.CARD_STATUS_WARNING);
+                }
+
+                return TransferType.TRANSFER_TYPE_SUCCESSFUL;
+            } else {
+                return TransferType.TRANSFER_TYPE_INSUFFICIENT_FUNDS;
+            }
+        } else {
+            return TransferType.TRANSFER_TYPE_FROZEN_CARD;
+        }
     }
 
     public boolean subtractBalance(Double subtraction) {

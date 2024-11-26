@@ -45,7 +45,12 @@ public class CreateCardAction extends Action {
                     .build();
 
             bank.addCard(account, card);
-            TransactionNotifier.notify(new CreateCardTransaction(commandInput.getTimestamp()), user);
+            TransactionNotifier.notify(new CreateCardTransaction(
+                        account.getIBAN(),
+                        card.getCardNumber(),
+                        user.getEmail(),
+                        commandInput.getTimestamp()),
+                    user);
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

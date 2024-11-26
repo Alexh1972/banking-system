@@ -7,7 +7,7 @@ import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 @Data
 @AllArgsConstructor
-public class Transaction implements ObjectNodeAcceptor {
+public abstract class Transaction implements ObjectNodeAcceptor {
     private String description;
     private Integer timestamp;
     @Override

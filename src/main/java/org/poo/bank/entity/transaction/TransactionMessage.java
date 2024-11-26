@@ -8,7 +8,9 @@ public enum TransactionMessage {
     TRANSACTION_MESSAGE_CARD_CREATED("New card created"),
     TRANSACTION_MESSAGE_CARD_DELETED("Card deleted"),
     TRANSACTION_MESSAGE_CARD_DELETED_ERROR_OWNER("Wrong owner"),
-    TRANSACTION_MESSAGE_INSUFFICIENT_FUNDS("Insufficient funds");
+    TRANSACTION_MESSAGE_INSUFFICIENT_FUNDS("Insufficient funds"),
+    TRANSACTION_MESSAGE_ACCOUNT_DELETED("Account deleted"),
+    TRANSACTION_MESSAGE_ACCOUNT_DELETE_ERROR("Account couldn't be deleted - see org.poo.transactions for details");
 
     private final String value;
     TransactionMessage(String value) {
