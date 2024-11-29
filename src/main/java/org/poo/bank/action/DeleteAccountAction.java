@@ -24,16 +24,19 @@ public class DeleteAccountAction extends Action {
             if (user == null || !user.equals(bank.getUser(commandInput.getEmail())))
                 throw new RuntimeException("User not found");
 
+            ObjectNode resultNode = getMapper().createObjectNode();
             ObjectNode objectNode = getMapper().createObjectNode();
             if (account.getBalance() == 0) {
                 bank.deleteAccount(user, account);
 
-                objectNode.put("success", TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_DELETED.getValue());
-                return objectNode;
+                resultNode.put("success", TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_DELETED.getValue());
             } else {
-                objectNode.put("error", TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_DELETE_ERROR.getValue());
-                return objectNode;
+                resultNode.put("error", TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_DELETE_ERROR.getValue());
             }
+
+            resultNode.put("timestamp", commandInput.getTimestamp());
+            objectNode.put("output", resultNode);
+            return objectNode;
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

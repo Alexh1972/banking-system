@@ -14,14 +14,16 @@ public class SendMoneyAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
         try {
-            Account sender = bank.getAccount(commandInput.getAccount());
+            Account sender = bank.getAccount(commandInput.getEmail(), commandInput.getAccount());
             User senderUser = bank.getUser(sender);
 
             Account receiver = bank.getAccount(senderUser.getEmail(), commandInput.getReceiver());
             User receiverUser = bank.getUser(receiver);
-
+if (commandInput.getDescription().equals("Uber rides for commuting")) {
+    int a = 1;
+}
             if (sender == null || receiver == null) {
-                throw new RuntimeException("User not found");
+                return null;
             }
 
             Double amount = bank.getAmount(commandInput.getAmount(), sender.getCurrency(), receiver.getCurrency());
@@ -37,7 +39,8 @@ public class SendMoneyAction extends Action {
                                     receiver.getIBAN(),
                                     sender.getIBAN(),
                                     TransferType.TRANSFER_TYPE_RECEIVED),
-                            receiverUser);
+                            receiverUser,
+                            receiver);
                 TransactionNotifier.notify(new SendMoneyTransaction(
                                 commandInput.getDescription(),
                                 commandInput.getTimestamp(),
@@ -46,7 +49,8 @@ public class SendMoneyAction extends Action {
                                 receiver.getIBAN(),
                                 sender.getIBAN(),
                                 TransferType.TRANSFER_TYPE_SENT),
-                        senderUser);
+                        senderUser,
+                        sender);
                 if (!receiver.getIBAN().equals(sender.getIBAN()))
                     TransactionNotifier.notify(new SendMoneyTransaction(
                                     commandInput.getDescription(),
@@ -56,9 +60,10 @@ public class SendMoneyAction extends Action {
                                     receiver.getIBAN(),
                                     sender.getIBAN(),
                                     TransferType.TRANSFER_TYPE_RECEIVED),
-                            receiverUser);
+                            receiverUser,
+                            receiver);
             } else {
-                TransactionNotifier.notify(new InsufficientFundsTransaction(commandInput.getTimestamp()), senderUser);
+                TransactionNotifier.notify(new InsufficientFundsTransaction(commandInput.getTimestamp()), senderUser, sender);
             }
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());

@@ -8,6 +8,8 @@ import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 
+import java.util.List;
+
 public class ObjectNodeConverter implements ObjectNodeVisitor {
     private static final ObjectMapper mapper = new ObjectMapper();
     @Override
@@ -91,11 +93,6 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     @Override
-    public ObjectNode toObjectNode(DeleteCardTransaction transaction) {
-        return toObjectNode((Transaction) transaction);
-    }
-
-    @Override
     public ObjectNode toObjectNode(InsufficientFundsTransaction transaction) {
         return toObjectNode((Transaction) transaction);
     }
@@ -108,5 +105,62 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         objectNode.put("senderIBAN", transaction.getSenderIBAN());
         objectNode.put("transferType", transaction.getTransferType().getValue());
         return objectNode;
+    }
+
+    @Override
+    public ObjectNode toObjectNode(CardPaymentTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+
+        objectNode.put("commerciant", transaction.getCommerciant());
+        objectNode.put("amount", transaction.getAmount());
+
+        return objectNode;
+    }
+
+
+    @Override
+    public ObjectNode toObjectNode(DeleteCardTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+
+        objectNode.put("account", transaction.getAccount());
+        objectNode.put("card", transaction.getCard());
+        objectNode.put("cardHolder", transaction.getCardHolder());
+
+        return objectNode;
+    }
+
+    @Override
+    public ObjectNode toObjectNode(SplitPaymentTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+
+        objectNode.put("amount", transaction.getAmount());
+        objectNode.put("currency", transaction.getCurrency());
+
+        ArrayNode arrayNode = mapper.createArrayNode();
+        for (String account : transaction.getInvolvedAccounts()) {
+            arrayNode.add(account);
+        }
+
+        objectNode.put("involvedAccounts", arrayNode);
+        return objectNode;
+    }
+
+    @Override
+    public ObjectNode toObjectNode(SplitPaymentErrorTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((SplitPaymentTransaction) transaction);
+
+        objectNode.put("error", transaction.getError());
+        return objectNode;
+    }
+
+    @Override
+    public ArrayNode toArrayNode(List<Transaction> transactionList) {
+        ArrayNode arrayNode = mapper.createArrayNode();
+
+        for (Transaction transaction : transactionList) {
+            arrayNode.add(transaction.accept(this));
+        }
+
+        return arrayNode;
     }
 }

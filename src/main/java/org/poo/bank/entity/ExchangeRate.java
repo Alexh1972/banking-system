@@ -1,4 +1,4 @@
-package org.poo.bank;
+package org.poo.bank.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ExchangeRate {
-    private String to;
     private String from;
+    private String to;
     private Double rate;
 }

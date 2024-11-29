@@ -30,10 +30,12 @@ public class AddAccountAction extends Action {
                     .balance(0.0)
                     .minimumBalance(0.0)
                     .cards(new ArrayList<>())
+                    .transactions(new ArrayList<>())
+                    .interestRate(commandInput.getInterestRate())
                     .build();
 
             bank.addAccount(account, user);
-            TransactionNotifier.notify(new CreateAccountTransaction(commandInput.getTimestamp()), user);
+            TransactionNotifier.notify(new CreateAccountTransaction(commandInput.getTimestamp()), user, account);
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

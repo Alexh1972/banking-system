@@ -25,6 +25,11 @@ public abstract class Action {
                 case "printTransactions" -> new GetTransactionsAction();
                 case "sendMoney" -> new SendMoneyAction();
                 case "setAlias" -> new SetAliasAction();
+                case "splitPayment" -> new SplitPaymentAction();
+                case "report" -> new GetReportAction();
+//                case "spendingsReport" -> new GetReportAction();
+                case "changeInterestRate" -> new ChangeInterestRate();
+                case "addInterest" -> new AddInterestAction();
                 default -> throw new IllegalArgumentException("Unexpected action value: " + action);
             };
     }

@@ -33,7 +33,8 @@ public class CreateCardAction extends Action {
                         new CreateCardTransaction(
                                 TransactionMessage.TRANSACTION_MESSAGE_CARD_DELETED_ERROR_OWNER,
                                 commandInput.getTimestamp()),
-                        user);
+                        user,
+                        null);
                 throw new RuntimeException("User not found");
             }
 
@@ -44,13 +45,15 @@ public class CreateCardAction extends Action {
                     .ownerEmail(user.getEmail())
                     .build();
 
+
             bank.addCard(account, card);
             TransactionNotifier.notify(new CreateCardTransaction(
                         account.getIBAN(),
                         card.getCardNumber(),
                         user.getEmail(),
                         commandInput.getTimestamp()),
-                    user);
+                    user,
+                    account);
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

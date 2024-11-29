@@ -18,8 +18,9 @@ public class DeleteCardAction extends Action {
 
             Card card = bank.getCard(commandInput.getCardNumber());
 
-            if (card == null)
-                throw new RuntimeException("Card not found");
+            if (card == null) {
+                return null;
+            }
 
             Account account = bank.getAccount(card);
 
@@ -32,7 +33,14 @@ public class DeleteCardAction extends Action {
                 throw new RuntimeException("User not found");
 
             bank.deleteCard(card, account);
-            TransactionNotifier.notify(new DeleteCardTransaction(commandInput.getTimestamp()), user);
+            TransactionNotifier.notify(
+                    new DeleteCardTransaction(
+                            account.getIBAN(),
+                            card.getCardNumber(),
+                            card.getOwnerEmail(),
+                            commandInput.getTimestamp()),
+                    user,
+                    account);
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

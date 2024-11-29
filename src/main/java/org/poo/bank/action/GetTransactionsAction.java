@@ -27,14 +27,8 @@ public class GetTransactionsAction extends Action {
 
             ObjectMapper mapper = getMapper();
             ObjectNode objectNode = mapper.createObjectNode();
-            ArrayNode arrayNode = mapper.createArrayNode();
 
-
-            for (Transaction transaction : user.getTransactions()) {
-                arrayNode.add(transaction.accept(objectNodeConverter));
-            }
-
-            objectNode.put("output", arrayNode);
+            objectNode.put("output", objectNodeConverter.toArrayNode(user.getTransactions()));
             return objectNode;
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());

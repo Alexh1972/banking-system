@@ -61,10 +61,10 @@ public final class Main {
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-//                if (i == 8) {
+                if (i == 9) {
                  System.out.println(filepath);
                     action(file.getName(), filepath);
-//                }
+                }
             }
             i++;
         }

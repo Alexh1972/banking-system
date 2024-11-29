@@ -3,13 +3,16 @@ package org.poo.bank.entity.account;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Builder;
 import lombok.Data;
+import org.poo.bank.BankSingleton;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;
 import org.poo.bank.entity.account.card.CardType;
+import org.poo.bank.entity.transaction.Transaction;
 import org.poo.bank.entity.transaction.TransferType;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,13 +27,17 @@ public class Account implements ObjectNodeAcceptor {
     private List<Card> cards;
     private Double interestRate;
     private Double minimumBalance;
+    private List<Transaction> transactions;
 
+    public boolean canPay(Double amount) {
+        return amount <= balance;
+    }
+
+    public boolean isMinimumBalanceReached() {
+        return minimumBalance >= balance;
+    }
     public TransferType subtractBalance(Double subtraction, Card card) {
-        if (card.getType().equals(CardType.CARD_TYPE_ONE_TIME)) {
-            card.setStatus(CardStatus.CARD_STATUS_FROZEN);
-        }
-
-        if (card.getStatus() != CardStatus.CARD_STATUS_FROZEN) {
+        if (!card.getStatus().equals(CardStatus.CARD_STATUS_FROZEN)) {
             if (subtractBalance(subtraction)) {
                 if (balance <= minimumBalance) {
                     card.setStatus(CardStatus.CARD_STATUS_FROZEN);
@@ -40,6 +47,10 @@ public class Account implements ObjectNodeAcceptor {
 
                 return TransferType.TRANSFER_TYPE_SUCCESSFUL;
             } else {
+                if (card.getType().equals(CardType.CARD_TYPE_ONE_TIME)) {
+                    card.setStatus(CardStatus.CARD_STATUS_FROZEN);
+                }
+
                 return TransferType.TRANSFER_TYPE_INSUFFICIENT_FUNDS;
             }
         } else {
@@ -48,7 +59,7 @@ public class Account implements ObjectNodeAcceptor {
     }
 
     public boolean subtractBalance(Double subtraction) {
-        if (balance - subtraction >= 0) {
+        if (canPay(subtraction)) {
             balance -= subtraction;
             return true;
         }
@@ -56,8 +67,16 @@ public class Account implements ObjectNodeAcceptor {
         return false;
     }
 
+    public void addInterest() {
+        balance += interestRate * balance;
+    }
+
     public void addBalance(Double addition) {
         balance += addition;
+    }
+
+    public void transactionUpdate(Transaction transaction) {
+        transactions.add(transaction);
     }
 
     @Override

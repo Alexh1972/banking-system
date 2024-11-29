@@ -1,11 +1,10 @@
 package org.poo.bank;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.poo.bank.entity.Alias;
-import org.poo.bank.entity.transaction.Transaction;
+import org.poo.bank.entity.ExchangeRate;
 import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
@@ -50,8 +49,8 @@ public class Bank {
 
         List<ExchangeRate> rates = new ArrayList<>();
         for (ExchangeInput exchangeInput : objectInput.getExchangeRates()) {
-            rates.add(new ExchangeRate(exchangeInput.getTo(), exchangeInput.getFrom(), exchangeInput.getRate()));
-            rates.add(new ExchangeRate(exchangeInput.getFrom(), exchangeInput.getTo(), 1 / exchangeInput.getRate()));
+            rates.add(new ExchangeRate(exchangeInput.getFrom(), exchangeInput.getTo(), exchangeInput.getRate()));
+            rates.add(new ExchangeRate(exchangeInput.getTo(), exchangeInput.getFrom(), 1 / exchangeInput.getRate()));
         }
 
         combineRates(rates);
@@ -74,14 +73,22 @@ public class Bank {
                     if (first.getTo().equals(second.getFrom()) && !first.getFrom().equals(second.getTo())) {
                         if (!exchangeRates.containsKey(first.getFrom() + DELIMITER + second.getTo())) {
                             changed = true;
+
                             exchangeRates.put(first.getFrom() + DELIMITER + second.getTo(), first.getRate() * second.getRate());
+                            ExchangeRate exchangeRate = new ExchangeRate(first.getFrom(), second.getTo(), first.getRate() * second.getRate());
+                            rates.add(exchangeRate);
+                            //exchangeRates.put(first.getTo() + DELIMITER + second.getFrom(), 1 / (first.getRate() * second.getRate()));
                         }
                     }
 
                     if (second.getTo().equals(first.getFrom()) && !second.getFrom().equals(first.getTo())) {
                         if (!exchangeRates.containsKey(second.getFrom() + DELIMITER + first.getTo())) {
                             changed = true;
+
                             exchangeRates.put(second.getFrom() + DELIMITER + first.getTo(), first.getRate() * second.getRate());
+                            //exchangeRates.put(second.getFrom() + DELIMITER + first.getTo(), 1 / (first.getRate() * second.getRate()));
+                            ExchangeRate exchangeRate = new ExchangeRate(second.getFrom(), first.getTo(), first.getRate() * second.getRate());
+                            rates.add(exchangeRate);
                         }
                     }
 
