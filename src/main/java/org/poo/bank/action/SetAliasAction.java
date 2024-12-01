@@ -11,7 +11,7 @@ public class SetAliasAction extends Action {
             if (commandInput.getEmail() == null)
                 throw new RuntimeException("User not found");
 
-            bank.setAlias(commandInput.getEmail(), commandInput.getAlias(), commandInput.getAccount());
+            bank.setAlias(commandInput.getAlias(), commandInput.getAccount());
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

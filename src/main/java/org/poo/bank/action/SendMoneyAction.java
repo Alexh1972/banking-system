@@ -14,14 +14,12 @@ public class SendMoneyAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
         try {
-            Account sender = bank.getAccount(commandInput.getEmail(), commandInput.getAccount());
+            Account sender = bank.getAccount(commandInput.getAccount());
             User senderUser = bank.getUser(sender);
 
-            Account receiver = bank.getAccount(senderUser.getEmail(), commandInput.getReceiver());
+            Account receiver = bank.getAlias(commandInput.getReceiver());
             User receiverUser = bank.getUser(receiver);
-if (commandInput.getDescription().equals("Uber rides for commuting")) {
-    int a = 1;
-}
+
             if (sender == null || receiver == null) {
                 return null;
             }

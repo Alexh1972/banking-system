@@ -29,8 +29,6 @@ public class AddAccountAction extends Action {
                     .IBAN(Utils.generateIBAN())
                     .balance(0.0)
                     .minimumBalance(0.0)
-                    .cards(new ArrayList<>())
-                    .transactions(new ArrayList<>())
                     .interestRate(commandInput.getInterestRate())
                     .build();
 

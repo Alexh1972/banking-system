@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Data
-@Builder
 public class Account implements ObjectNodeAcceptor {
     private static final Double WARNING_BALANCE_THRESHOLD = 30.0;
     private String IBAN;
@@ -28,6 +27,17 @@ public class Account implements ObjectNodeAcceptor {
     private Double interestRate;
     private Double minimumBalance;
     private List<Transaction> transactions;
+    @Builder
+    public Account(String IBAN, Double balance, String currency, AccountType accountType, Double interestRate, Double minimumBalance) {
+        this.IBAN = IBAN;
+        this.balance = balance;
+        this.currency = currency;
+        this.accountType = accountType;
+        this.interestRate = interestRate;
+        this.minimumBalance = minimumBalance;
+        this.cards = new ArrayList<>();
+        this.transactions = new ArrayList<>();
+    }
 
     public boolean canPay(Double amount) {
         return amount <= balance;

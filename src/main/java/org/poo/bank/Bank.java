@@ -30,6 +30,7 @@ public class Bank {
     private Map<Card, Account> accountCardMap;
     private Map<String, Double> exchangeRates;
     private Map<Alias, String> aliasMap;
+    private Map<String, String> globalAliasMap;
 
     public void initialize(ObjectInput objectInput) {
         users = new ArrayList<>();
@@ -40,6 +41,7 @@ public class Bank {
         accountCardMap = new HashMap<>();
         exchangeRates = new HashMap<>();
         aliasMap = new HashMap<>();
+        globalAliasMap = new HashMap<>();
 
         for (UserInput userInput : objectInput.getUsers()) {
             User user = new User(userInput.getFirstName(), userInput.getLastName(), userInput.getEmail());
@@ -101,18 +103,36 @@ public class Bank {
         return accountIBANMap.get(account);
     }
 
-    public Account getAccount(String email, String aliasName) {
-        Alias alias = new Alias(aliasName, email);
-        String account = aliasMap.get(alias);
+    public Account getAccount(String email, String aliasName, boolean global) {
+        String account;
+        if (!global) {
+            Alias alias = new Alias(aliasName, email);
+            account = aliasMap.get(alias);
+        } else {
+            account = globalAliasMap.get(aliasName);
+        }
 
         if (account == null)
             account = aliasName;
 
         return getAccount(account);
     }
+
+    public Account getAlias(String alias) {
+        String account = globalAliasMap.get(alias);
+
+        if (account == null)
+            account = alias;
+
+        return getAccount(account);
+    }
     public void setAlias(String user, String aliasName, String IBAN) {
         Alias alias = new Alias(aliasName, user);
         aliasMap.put(alias, IBAN);
+    }
+
+    public void setAlias(String aliasName, String IBAN) {
+        globalAliasMap.put(aliasName, IBAN);
     }
 
     public User getUser(String email) {
