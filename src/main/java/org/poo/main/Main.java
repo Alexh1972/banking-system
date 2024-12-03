@@ -61,7 +61,7 @@ public final class Main {
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-//                if (i == 6) {
+//                if (i == 17) {
                  System.out.println(filepath);
                     action(file.getName(), filepath);
 //                }

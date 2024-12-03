@@ -14,7 +14,7 @@ public class SetMinimumBalanceAction extends Action {
             if (account == null)
                 throw new RuntimeException("User not found");
 
-            account.setMinimumBalance(commandInput.getMinBalance());
+            account.setMinimumBalance(commandInput.getAmount());
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }

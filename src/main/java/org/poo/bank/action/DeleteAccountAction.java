@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
 import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
+import org.poo.bank.entity.transaction.DeleteCardErrorTransaction;
 import org.poo.bank.entity.transaction.TransactionMessage;
+import org.poo.bank.notification.TransactionNotifier;
 import org.poo.fileio.CommandInput;
 
 public class DeleteAccountAction extends Action {
@@ -31,7 +33,10 @@ public class DeleteAccountAction extends Action {
 
                 resultNode.put("success", TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_DELETED.getValue());
             } else {
-                resultNode.put("error", TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_DELETE_ERROR.getValue());
+                resultNode.put("error", TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_DELETE_ERROR_OUT.getValue());
+                TransactionNotifier.notify(new DeleteCardErrorTransaction(commandInput.getTimestamp()),
+                        user,
+                        account);
             }
 
             resultNode.put("timestamp", commandInput.getTimestamp());

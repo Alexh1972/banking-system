@@ -57,10 +57,6 @@ public class Account implements ObjectNodeAcceptor {
 
                 return TransferType.TRANSFER_TYPE_SUCCESSFUL;
             } else {
-                if (card.getType().equals(CardType.CARD_TYPE_ONE_TIME)) {
-                    card.setStatus(CardStatus.CARD_STATUS_FROZEN);
-                }
-
                 return TransferType.TRANSFER_TYPE_INSUFFICIENT_FUNDS;
             }
         } else {
