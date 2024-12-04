@@ -32,6 +32,9 @@ public class CardPaymentAction extends Action {
             Account account = bank.getAccount(card);
             User user = bank.getUser(account);
 
+            if (commandInput.getCommerciant().equals("Microsoft")) {
+                int a = 1;
+            }
             Double amountSpent = bank.getAmount(commandInput.getAmount(),
                     commandInput.getCurrency(),
                     account.getCurrency());
@@ -59,9 +62,24 @@ public class CardPaymentAction extends Action {
                                 .ownerEmail(user.getEmail())
                                 .build();
 
+                        bank.deleteCard(card, account);
+                        TransactionNotifier.notify(
+                                new DeleteCardTransaction(
+                                        account.getIBAN(),
+                                        card.getCardNumber(),
+                                        card.getOwnerEmail(),
+                                        commandInput.getTimestamp()),
+                                user,
+                                account);
 
                         bank.addCard(account, newCard);
-                        bank.deleteCard(card, account);
+                        TransactionNotifier.notify(new CreateCardTransaction(
+                                        account.getIBAN(),
+                                        newCard.getCardNumber(),
+                                        user.getEmail(),
+                                        commandInput.getTimestamp()),
+                                user,
+                                account);
                     }
                 }
                 case TRANSFER_TYPE_FROZEN_CARD -> TransactionNotifier.notify(

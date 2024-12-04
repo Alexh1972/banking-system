@@ -27,7 +27,7 @@ public abstract class Action {
                 case "setAlias" -> new SetAliasAction();
                 case "splitPayment" -> new SplitPaymentAction();
                 case "report" -> new GetReportAction();
-//                case "spendingsReport" -> new GetReportAction();
+                case "spendingsReport" -> new GetSpendingsReportAction();
                 case "changeInterestRate" -> new ChangeInterestRate();
                 case "addInterest" -> new AddInterestAction();
                 default -> throw new IllegalArgumentException("Unexpected action value: " + action);

@@ -12,6 +12,8 @@ import org.poo.bank.entity.transaction.TransferType;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -67,6 +69,9 @@ public class Account implements ObjectNodeAcceptor {
     public boolean subtractBalance(Double subtraction) {
         if (canPay(subtraction)) {
             balance -= subtraction;
+            balance = new BigDecimal(balance)
+                    .setScale(15, RoundingMode.HALF_UP)
+                    .doubleValue();
             return true;
         }
 

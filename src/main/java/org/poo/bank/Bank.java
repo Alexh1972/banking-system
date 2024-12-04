@@ -12,6 +12,8 @@ import org.poo.fileio.ExchangeInput;
 import org.poo.fileio.ObjectInput;
 import org.poo.fileio.UserInput;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +81,6 @@ public class Bank {
                             exchangeRates.put(first.getFrom() + DELIMITER + second.getTo(), first.getRate() * second.getRate());
                             ExchangeRate exchangeRate = new ExchangeRate(first.getFrom(), second.getTo(), first.getRate() * second.getRate());
                             rates.add(exchangeRate);
-                            //exchangeRates.put(first.getTo() + DELIMITER + second.getFrom(), 1 / (first.getRate() * second.getRate()));
                         }
                     }
 
@@ -88,7 +89,6 @@ public class Bank {
                             changed = true;
 
                             exchangeRates.put(second.getFrom() + DELIMITER + first.getTo(), first.getRate() * second.getRate());
-                            //exchangeRates.put(second.getFrom() + DELIMITER + first.getTo(), 1 / (first.getRate() * second.getRate()));
                             ExchangeRate exchangeRate = new ExchangeRate(second.getFrom(), first.getTo(), first.getRate() * second.getRate());
                             rates.add(exchangeRate);
                         }
@@ -200,7 +200,7 @@ public class Bank {
         Double rate = getRate(from, to);
 
         if (rate != null) {
-            return amount * rate;
+            return new BigDecimal(amount * rate).setScale(15, RoundingMode.HALF_UP).doubleValue();
         }
 
         return null;

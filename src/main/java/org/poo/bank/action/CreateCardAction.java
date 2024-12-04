@@ -23,8 +23,10 @@ public class CreateCardAction extends Action {
         try {
             User user = bank.getUser(commandInput.getEmail());
 
-            if (user == null)
-                throw new RuntimeException("User not found");
+            if (user == null) {
+                return null;
+//                throw new RuntimeException("User not found");
+            }
 
             Account account = bank.getAccount(commandInput.getAccount());
 
@@ -35,7 +37,7 @@ public class CreateCardAction extends Action {
                                 commandInput.getTimestamp()),
                         user,
                         null);
-                throw new RuntimeException("User not found");
+                return null;
             }
 
             Card card = Card.builder()
