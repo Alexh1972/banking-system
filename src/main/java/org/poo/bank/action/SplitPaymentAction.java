@@ -26,8 +26,8 @@ public class SplitPaymentAction extends Action {
         for (String accountIBAN : accounts) {
             Account account = bank.getAccount(accountIBAN);
             Double amount = bank.getAmount(commandInput.getAmount(),
-                    account.getCurrency(),
-                    commandInput.getCurrency()) / numberPayers; // to - from pe invers
+                    commandInput.getCurrency(),
+                    account.getCurrency()) / numberPayers; // to - from pe invers
 
             if (!account.canPay(amount)) {
                 isPaymentValid = false;
@@ -41,8 +41,8 @@ public class SplitPaymentAction extends Action {
         if (isPaymentValid) {
             for (Account account : accountsList) {
                 Double amount = bank.getAmount(commandInput.getAmount(),
-                        account.getCurrency(),
-                        commandInput.getCurrency()) / numberPayers; // to - from pe invers
+                        commandInput.getCurrency(),
+                        account.getCurrency()) / numberPayers; // to - from pe invers
 
                 account.subtractBalance(amount);
             }

@@ -30,7 +30,7 @@ public class Bank {
     private Map<Account, User> userAccountMap;
     private Map<String, Card> cardNumberMap;
     private Map<Card, Account> accountCardMap;
-    private Map<String, Double> exchangeRates;
+    private Map<String, BigDecimal> exchangeRates;
     private Map<Alias, String> aliasMap;
     private Map<String, String> globalAliasMap;
 
@@ -53,8 +53,8 @@ public class Bank {
 
         List<ExchangeRate> rates = new ArrayList<>();
         for (ExchangeInput exchangeInput : objectInput.getExchangeRates()) {
-            rates.add(new ExchangeRate(exchangeInput.getFrom(), exchangeInput.getTo(), exchangeInput.getRate()));
-            rates.add(new ExchangeRate(exchangeInput.getTo(), exchangeInput.getFrom(), 1 / exchangeInput.getRate()));
+            rates.add(new ExchangeRate(exchangeInput.getFrom(), exchangeInput.getTo(), BigDecimal.valueOf(exchangeInput.getRate())));
+            rates.add(new ExchangeRate(exchangeInput.getTo(), exchangeInput.getFrom(), BigDecimal.valueOf(1 / exchangeInput.getRate())));
         }
 
         combineRates(rates);
@@ -78,8 +78,8 @@ public class Bank {
                         if (!exchangeRates.containsKey(first.getFrom() + DELIMITER + second.getTo())) {
                             changed = true;
 
-                            exchangeRates.put(first.getFrom() + DELIMITER + second.getTo(), first.getRate() * second.getRate());
-                            ExchangeRate exchangeRate = new ExchangeRate(first.getFrom(), second.getTo(), first.getRate() * second.getRate());
+                            exchangeRates.put(first.getFrom() + DELIMITER + second.getTo(), first.getRate().multiply(second.getRate()));
+                            ExchangeRate exchangeRate = new ExchangeRate(first.getFrom(), second.getTo(), first.getRate().multiply(second.getRate()));
                             rates.add(exchangeRate);
                         }
                     }
@@ -88,8 +88,8 @@ public class Bank {
                         if (!exchangeRates.containsKey(second.getFrom() + DELIMITER + first.getTo())) {
                             changed = true;
 
-                            exchangeRates.put(second.getFrom() + DELIMITER + first.getTo(), first.getRate() * second.getRate());
-                            ExchangeRate exchangeRate = new ExchangeRate(second.getFrom(), first.getTo(), first.getRate() * second.getRate());
+                            exchangeRates.put(second.getFrom() + DELIMITER + first.getTo(), first.getRate().multiply(second.getRate()));
+                            ExchangeRate exchangeRate = new ExchangeRate(second.getFrom(), first.getTo(), first.getRate().multiply(second.getRate()));
                             rates.add(exchangeRate);
                         }
                     }
@@ -187,7 +187,7 @@ public class Bank {
     }
 
     public Double getRate(String from, String to) {
-        return exchangeRates.get(from + DELIMITER + to);
+        return exchangeRates.get(from + DELIMITER + to).doubleValue();
     }
 
     public Double getAmount(Double amount, String from, String to) {
@@ -200,7 +200,7 @@ public class Bank {
         Double rate = getRate(from, to);
 
         if (rate != null) {
-            return new BigDecimal(amount * rate).setScale(15, RoundingMode.HALF_UP).doubleValue();
+            return amount * rate;
         }
 
         return null;

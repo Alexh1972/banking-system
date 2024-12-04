@@ -53,10 +53,10 @@ public class GetSpendingsReportAction extends Action {
             }
 
             ArrayNode arrayNode = getMapper().createArrayNode();
-            for (String commenciant : commerciantAmountMap.keySet().stream().sorted().toList()) {
+            for (String commerciant : commerciantAmountMap.keySet().stream().sorted().toList()) {
                 ObjectNode objectNode = getMapper().createObjectNode();
-                objectNode.put("commerciant", commenciant);
-                objectNode.put("total", commerciantAmountMap.get(commenciant));
+                objectNode.put("commerciant", commerciant);
+                objectNode.put("total", commerciantAmountMap.get(commerciant));
                 arrayNode.add(objectNode);
             }
 

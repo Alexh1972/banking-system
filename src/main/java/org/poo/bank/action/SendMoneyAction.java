@@ -24,9 +24,6 @@ public class SendMoneyAction extends Action {
                 return null;
             }
 
-            if (commandInput.getDescription().equals("Repayment for a personal loan")) {
-                int a = 1;
-            }
             Double amount = bank.getAmount(commandInput.getAmount(), sender.getCurrency(), receiver.getCurrency());
             if (sender.subtractBalance(commandInput.getAmount())) {
                 receiver.addBalance(amount);
