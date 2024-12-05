@@ -32,9 +32,6 @@ public class CardPaymentAction extends Action {
             Account account = bank.getAccount(card);
             User user = bank.getUser(account);
 
-            if (commandInput.getCommerciant().equals("Microsoft")) {
-                int a = 1;
-            }
             Double amountSpent = bank.getAmount(commandInput.getAmount(),
                     commandInput.getCurrency(),
                     account.getCurrency());

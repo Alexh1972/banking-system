@@ -69,9 +69,6 @@ public class Account implements ObjectNodeAcceptor {
     public boolean subtractBalance(Double subtraction) {
         if (canPay(subtraction)) {
             balance -= subtraction;
-            balance = new BigDecimal(balance)
-                    .setScale(15, RoundingMode.HALF_UP)
-                    .doubleValue();
             return true;
         }
 

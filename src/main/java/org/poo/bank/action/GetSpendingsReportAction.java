@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
 import org.poo.bank.entity.account.Account;
+import org.poo.bank.entity.account.AccountType;
 import org.poo.bank.entity.transaction.CardPaymentTransaction;
 import org.poo.bank.entity.transaction.Transaction;
 import org.poo.bank.entity.transaction.TransactionMessage;
@@ -24,6 +25,14 @@ public class GetSpendingsReportAction extends Action {
 
             if (account == null)
                 throw new RuntimeException("Account not found");
+
+            if (account.getAccountType().equals(AccountType.ACCOUNT_TYPE_SAVINGS)) {
+                ObjectNode objectNode = getMapper().createObjectNode();
+                ObjectNode errorNode = getMapper().createObjectNode();
+                errorNode.put("error", TransactionMessage.TRANSACTION_MESSAGE_REPORT_ACCOUNT_TYPE_ERROR.getValue());
+                objectNode.put("output", errorNode);
+                return objectNode;
+            }
 
             List<Transaction> transactions = account.getTransactions();
             Map<String, Double> commerciantAmountMap = new HashMap<>();

@@ -39,6 +39,7 @@ public class SendMoneyAction extends Action {
                                     TransferType.TRANSFER_TYPE_RECEIVED),
                             receiverUser,
                             receiver);
+
                 TransactionNotifier.notify(new SendMoneyTransaction(
                                 commandInput.getDescription(),
                                 commandInput.getTimestamp(),
@@ -49,6 +50,7 @@ public class SendMoneyAction extends Action {
                                 TransferType.TRANSFER_TYPE_SENT),
                         senderUser,
                         sender);
+
                 if (!receiver.getIBAN().equals(sender.getIBAN()))
                     TransactionNotifier.notify(new SendMoneyTransaction(
                                     commandInput.getDescription(),

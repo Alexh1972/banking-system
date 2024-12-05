@@ -17,7 +17,8 @@ public enum TransactionMessage {
     TRANSACTION_MESSAGE_SPLIT_PAYMENT_ERROR("Account {IBAN} has insufficient funds for a split payment."),
     TRANSACTION_MESSAGE_SET_CARD_TO_FROZEN("You have reached the minimum amount of funds, the card will be frozen"),
     TRANSACTION_MESSAGE_CARD_STATUS("The card is {status}"),
-    TRANSACTION_MESSAGE_CHANGE_INTEREST_RATE("Interest rate of the account changed to {amount}");
+    TRANSACTION_MESSAGE_CHANGE_INTEREST_RATE("Interest rate of the account changed to {amount}"),
+    TRANSACTION_MESSAGE_REPORT_ACCOUNT_TYPE_ERROR("This kind of report is not supported for a saving account");
 
     private final String value;
     TransactionMessage(String value) {
