@@ -12,17 +12,38 @@ import java.util.List;
 public class TransactionNotifier {
     private List<User> notifiedUsers = new ArrayList<>();
     private List<Account> notifiedAccount = new ArrayList<>();
-    public void addListener(User user, Account account) {
+
+    /**
+     * Adds a listener to a notification.
+     * @param user The listener's user.
+     * @param account THe listener's account.
+     */
+    public final void addListener(final User user,
+                                  final Account account) {
         notifiedUsers.add(user);
         notifiedAccount.add(account);
     }
 
-    public void removeListener(User user, Account account) {
+    /**
+     * Removes a listener.
+     * @param user The listener's user.
+     * @param account The listener's account.
+     */
+    public final void removeListener(final User user,
+                                     final Account account) {
         notifiedUsers.remove(user);
         notifiedAccount.remove(account);
     }
 
-    public static void notify(Transaction transaction, User user, Account account) {
+    /**
+     * Notifies a listener with a transaction.
+     * @param transaction The transaction.
+     * @param user The listener's user.
+     * @param account The listener's account.
+     */
+    public static void notify(final Transaction transaction,
+                              final User user,
+                              final Account account) {
         if (user != null) {
             user.transactionUpdate(transaction);
         }
@@ -31,7 +52,12 @@ public class TransactionNotifier {
             account.transactionUpdate(transaction);
         }
     }
-    public void notifyUsers(Transaction transaction) {
+
+    /**
+     * Notifies all listeners with a transaction.
+     * @param transaction The transaction.
+     */
+    public final void notifyUsers(final Transaction transaction) {
         for (User user : notifiedUsers) {
             user.transactionUpdate(transaction);
         }

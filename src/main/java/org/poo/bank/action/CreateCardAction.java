@@ -15,17 +15,16 @@ import org.poo.utils.Utils;
 
 public class CreateCardAction extends Action {
     private CardType cardType;
-    public CreateCardAction(CardType cardType) {
+    public CreateCardAction(final CardType cardType) {
         this.cardType = cardType;
     }
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             User user = bank.getUser(commandInput.getEmail());
 
             if (user == null) {
                 return null;
-//                throw new RuntimeException("User not found");
             }
 
             Account account = bank.getAccount(commandInput.getAccount());
@@ -50,7 +49,7 @@ public class CreateCardAction extends Action {
 
             bank.addCard(account, card);
             TransactionNotifier.notify(new CreateCardTransaction(
-                        account.getIBAN(),
+                        account.getIban(),
                         card.getCardNumber(),
                         user.getEmail(),
                         commandInput.getTimestamp()),

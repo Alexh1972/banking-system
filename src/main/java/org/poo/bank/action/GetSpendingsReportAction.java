@@ -17,19 +17,22 @@ import java.util.List;
 import java.util.Map;
 
 public class GetSpendingsReportAction extends Action {
-    private static final ObjectNodeVisitor objectNodeConverter = new ObjectNodeConverter();
+    private static final ObjectNodeVisitor OBJECT_NODE_CONVERTER = new ObjectNodeConverter();
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             Account account = bank.getAccount(commandInput.getAccount());
 
-            if (account == null)
+            if (account == null) {
                 throw new RuntimeException("Account not found");
+            }
 
             if (account.getAccountType().equals(AccountType.ACCOUNT_TYPE_SAVINGS)) {
                 ObjectNode objectNode = getMapper().createObjectNode();
                 ObjectNode errorNode = getMapper().createObjectNode();
-                errorNode.put("error", TransactionMessage.TRANSACTION_MESSAGE_REPORT_ACCOUNT_TYPE_ERROR.getValue());
+                errorNode.put("error",
+                        TransactionMessage.TRANSACTION_MESSAGE_REPORT_ACCOUNT_TYPE_ERROR
+                                .getValue());
                 objectNode.put("output", errorNode);
                 return objectNode;
             }
@@ -44,8 +47,8 @@ public class GetSpendingsReportAction extends Action {
                                             .TRANSACTION_MESSAGE_CARD_PAYMENT
                                             .getValue()))
                     .filter(t ->
-                            t.getTimestamp() >= commandInput.getStartTimestamp() &&
-                                    t.getTimestamp() <= commandInput.getEndTimestamp())
+                            t.getTimestamp() >= commandInput.getStartTimestamp()
+                                    && t.getTimestamp() <= commandInput.getEndTimestamp())
                     .toList();
 
             for (Transaction transaction : transactions) {
@@ -71,8 +74,8 @@ public class GetSpendingsReportAction extends Action {
 
             ObjectNode objectNode = getMapper().createObjectNode();
             ObjectNode accountNode = getMapper().createObjectNode();
-            accountNode.put("transactions", objectNodeConverter.toArrayNode(transactions));
-            accountNode.put("IBAN", account.getIBAN());
+            accountNode.put("transactions", OBJECT_NODE_CONVERTER.toArrayNode(transactions));
+            accountNode.put("IBAN", account.getIban());
             accountNode.put("balance", account.getBalance());
             accountNode.put("commerciants", arrayNode);
             accountNode.put("currency", account.getCurrency());

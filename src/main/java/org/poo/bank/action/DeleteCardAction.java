@@ -11,10 +11,11 @@ import org.poo.fileio.CommandInput;
 
 public class DeleteCardAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
-            if (commandInput.getEmail() == null)
+            if (commandInput.getEmail() == null) {
                 throw new RuntimeException("User not found");
+            }
 
             Card card = bank.getCard(commandInput.getCardNumber());
 
@@ -24,18 +25,20 @@ public class DeleteCardAction extends Action {
 
             Account account = bank.getAccount(card);
 
-            if (account == null)
+            if (account == null) {
                 throw new RuntimeException("User not found");
+            }
 
             User user = bank.getUser(account);
 
-            if (user == null || !user.equals(bank.getUser(commandInput.getEmail())))
+            if (user == null || !user.equals(bank.getUser(commandInput.getEmail()))) {
                 throw new RuntimeException("User not found");
+            }
 
             bank.deleteCard(card, account);
             TransactionNotifier.notify(
                     new DeleteCardTransaction(
-                            account.getIBAN(),
+                            account.getIban(),
                             card.getCardNumber(),
                             card.getOwnerEmail(),
                             commandInput.getTimestamp()),

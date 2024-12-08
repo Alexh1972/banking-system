@@ -11,14 +11,20 @@ public enum TransferType {
     TRANSFER_TYPE_SUCCESSFUL("successful");
     private final String value;
 
-    TransferType(String value) {
+    TransferType(final String value) {
         this.value = value;
     }
 
-    public static TransferType getAccountType(String value) {
+    /**
+     * Gets the transfer result by a given string.
+     * @param value The string.
+     * @return The transfer result.
+     */
+    public static TransferType getAccountType(final String value) {
         for (TransferType message : TransferType.values()) {
-            if (message.getValue().equals(value))
+            if (message.getValue().equals(value)) {
                 return message;
+            }
         }
 
         return null;

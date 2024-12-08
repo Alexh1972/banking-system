@@ -6,8 +6,6 @@ import lombok.Setter;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 @Getter
@@ -17,11 +15,11 @@ public class SplitPaymentTransaction extends Transaction implements ObjectNodeAc
     private String currency;
     private Integer numberPayers;
     private List<String> involvedAccounts;
-    public SplitPaymentTransaction(Double amount,
-                                   String currency,
-                                   Integer numberPayers,
-                                   List<String> involvedAccounts,
-                                   Integer timestamp) {
+    public SplitPaymentTransaction(final Double amount,
+                                   final String currency,
+                                   final Integer numberPayers,
+                                   final List<String> involvedAccounts,
+                                   final Integer timestamp) {
         super(TransactionMessage.TRANSACTION_MESSAGE_SPLIT_PAYMENT
                 .getValue()
                 .replace("{amount|currency}",
@@ -33,12 +31,12 @@ public class SplitPaymentTransaction extends Transaction implements ObjectNodeAc
         this.involvedAccounts = involvedAccounts;
     }
 
-    public SplitPaymentTransaction(Double amount,
-                                   String currency,
-                                   Integer numberPayers,
-                                   List<String> involvedAccounts,
-                                   String description,
-                                   Integer timestamp) {
+    public SplitPaymentTransaction(final Double amount,
+                                   final String currency,
+                                   final Integer numberPayers,
+                                   final List<String> involvedAccounts,
+                                   final String description,
+                                   final Integer timestamp) {
         super(description,
                 timestamp);
         this.amount = amount / numberPayers;
@@ -47,8 +45,14 @@ public class SplitPaymentTransaction extends Transaction implements ObjectNodeAc
         this.involvedAccounts = involvedAccounts;
     }
 
+    /**
+     * Double dispatch for creating object node
+     * representation of the transaction.
+     * @param objectNodeVisitor The transaction.
+     * @return The object node.
+     */
     @Override
-    public ObjectNode accept(ObjectNodeVisitor objectNodeVisitor) {
+    public ObjectNode accept(final ObjectNodeVisitor objectNodeVisitor) {
         return objectNodeVisitor.toObjectNode(this);
     }
 }

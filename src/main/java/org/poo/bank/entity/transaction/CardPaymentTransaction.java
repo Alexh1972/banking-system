@@ -10,14 +10,22 @@ import org.poo.bank.visitor.ObjectNodeVisitor;
 public class CardPaymentTransaction extends Transaction implements ObjectNodeAcceptor {
     private String commerciant;
     private Double amount;
-    public CardPaymentTransaction(String commerciant, Double amount, Integer timestamp) {
+    public CardPaymentTransaction(final String commerciant,
+                                  final Double amount,
+                                  final Integer timestamp) {
         super(TransactionMessage.TRANSACTION_MESSAGE_CARD_PAYMENT.getValue(), timestamp);
         this.commerciant = commerciant;
         this.amount = amount;
     }
 
+    /**
+     * Double dispatch for creating object node
+     * representation of the transaction.
+     * @param objectNodeVisitor The transaction.
+     * @return The object node.
+     */
     @Override
-    public ObjectNode accept(ObjectNodeVisitor objectNodeVisitor) {
+    public ObjectNode accept(final ObjectNodeVisitor objectNodeVisitor) {
         return objectNodeVisitor.toObjectNode(this);
     }
 }

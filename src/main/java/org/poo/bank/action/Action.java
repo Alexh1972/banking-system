@@ -7,10 +7,22 @@ import org.poo.bank.entity.account.card.CardType;
 import org.poo.fileio.CommandInput;
 
 public abstract class Action {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    /**
+     * Executes a bank action.
+     * @param bank The bank.
+     * @param commandInput The input of the action.
+     * @return The result of the action.
+     */
     public abstract ObjectNode execute(Bank bank, CommandInput commandInput);
 
-    public static Action toAction(String action) {
+    /**
+     * Factory for the bank action.
+     * @param action The action's name.
+     * @return The instance of the action.
+     */
+    public static Action toAction(final String action) {
         return switch (action) {
                 case "printUsers" ->  new GetUsersAction();
                 case "addAccount" -> new AddAccountAction();
@@ -34,9 +46,15 @@ public abstract class Action {
             };
     }
 
-    public ObjectNode executeError(String message, int timestamp) {
-        ObjectNode objectNode = mapper.createObjectNode();
-        ObjectNode detailNode = mapper.createObjectNode();
+    /**
+     * Returns the error from an action.
+     * @param message The error message.
+     * @param timestamp The timestamp of the action.
+     * @return The error.
+     */
+    public final ObjectNode executeError(final String message, final int timestamp) {
+        ObjectNode objectNode = MAPPER.createObjectNode();
+        ObjectNode detailNode = MAPPER.createObjectNode();
 
         detailNode.put("description", message);
         detailNode.put("timestamp", timestamp);
@@ -45,7 +63,7 @@ public abstract class Action {
         return objectNode;
     }
 
-    protected ObjectMapper getMapper() {
-        return mapper;
+    protected final ObjectMapper getMapper() {
+        return MAPPER;
     }
 }

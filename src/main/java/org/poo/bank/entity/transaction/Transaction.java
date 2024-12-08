@@ -10,8 +10,15 @@ import org.poo.bank.visitor.ObjectNodeVisitor;
 public abstract class Transaction implements ObjectNodeAcceptor {
     private String description;
     private Integer timestamp;
+
+    /**
+     * Double dispatch for creating object node
+     * representation of the transaction.
+     * @param objectNodeVisitor The transaction.
+     * @return The object node.
+     */
     @Override
-    public ObjectNode accept(ObjectNodeVisitor objectNodeVisitor) {
+    public ObjectNode accept(final ObjectNodeVisitor objectNodeVisitor) {
         return objectNodeVisitor.toObjectNode(this);
     }
 }

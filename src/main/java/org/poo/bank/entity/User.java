@@ -21,7 +21,9 @@ public class User implements ObjectNodeAcceptor, TransactionListener {
     private List<Account> accounts;
     private List<Transaction> transactions;
 
-    public User(String firstName, String lastName, String email) {
+    public User(final String firstName,
+                final String lastName,
+                final String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -29,24 +31,43 @@ public class User implements ObjectNodeAcceptor, TransactionListener {
         transactions = new ArrayList<>();
     }
 
+    /**
+     * Double dispatch for converting user to object node.
+     * @param objectNodeVisitor The object node visitor.
+     * @return The object node.
+     */
     @Override
-    public ObjectNode accept(ObjectNodeVisitor objectNodeVisitor) {
+    public ObjectNode accept(final ObjectNodeVisitor objectNodeVisitor) {
         return objectNodeVisitor.toObjectNode(this);
     }
 
+    /**
+     * Notifies the user after receiving a transaction.
+     * @param transaction The transaction.
+     */
     @Override
-    public void transactionUpdate(Transaction transaction) {
+    public void transactionUpdate(final Transaction transaction) {
         transactions.add(transaction);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public final boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         User user = (User) o;
         return Objects.equals(email, user.email);
     }
 
+    /**
+     *
+     * @return Hash code.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(email);

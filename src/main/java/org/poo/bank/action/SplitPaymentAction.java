@@ -2,7 +2,6 @@ package org.poo.bank.action;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
-import org.poo.bank.entity.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.transaction.SplitPaymentErrorTransaction;
 import org.poo.bank.entity.transaction.SplitPaymentTransaction;
@@ -15,7 +14,7 @@ import java.util.List;
 
 public class SplitPaymentAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         TransactionNotifier notifier = new TransactionNotifier();
         List<String> accounts = commandInput.getAccounts();
         List<Account> accountsList = new ArrayList<>();
@@ -25,7 +24,8 @@ public class SplitPaymentAction extends Action {
 
         for (String accountIBAN : accounts) {
             Account account = bank.getAccount(accountIBAN);
-            Double amount = bank.getAmount(commandInput.getAmount(),
+            Double amount = bank.getAmount(
+                    commandInput.getAmount(),
                     commandInput.getCurrency(),
                     account.getCurrency()) / numberPayers;
 
@@ -40,14 +40,16 @@ public class SplitPaymentAction extends Action {
 
         if (isPaymentValid) {
             for (Account account : accountsList) {
-                Double amount = bank.getAmount(commandInput.getAmount(),
+                Double amount = bank.getAmount(
+                        commandInput.getAmount(),
                         commandInput.getCurrency(),
                         account.getCurrency()) / numberPayers;
 
                 account.subtractBalance(amount);
             }
 
-            Transaction transaction = new SplitPaymentTransaction(
+            Transaction transaction =
+                    new SplitPaymentTransaction(
                     commandInput.getAmount(),
                     commandInput.getCurrency(),
                     numberPayers,
@@ -55,7 +57,8 @@ public class SplitPaymentAction extends Action {
                     commandInput.getTimestamp());
             notifier.notifyUsers(transaction);
         } else {
-            Transaction transaction = new SplitPaymentErrorTransaction(
+            Transaction transaction =
+                    new SplitPaymentErrorTransaction(
                     commandInput.getAmount(),
                     commandInput.getCurrency(),
                     numberPayers,

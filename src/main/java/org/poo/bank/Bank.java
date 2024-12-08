@@ -23,7 +23,7 @@ import java.util.Map;
 @ToString
 public class Bank {
     private static final String DELIMITER = "$";
-    private List <User> users;
+    private List<User> users;
     private Map<String, Account> accountIBANMap;
     private Map<String, User> userEmailMap;
     private Map<Account, User> userAccountMap;
@@ -33,7 +33,12 @@ public class Bank {
     private Map<Alias, String> aliasMap;
     private Map<String, String> globalAliasMap;
 
-    public void initialize(ObjectInput objectInput) {
+    /**
+     * Initialize the bank given input such as exchange rates,
+     * users, etc.
+     * @param objectInput The input.
+     */
+    public final void initialize(final ObjectInput objectInput) {
         users = new ArrayList<>();
         accountIBANMap = new HashMap<>();
         userEmailMap = new HashMap<>();
@@ -45,23 +50,37 @@ public class Bank {
         globalAliasMap = new HashMap<>();
 
         for (UserInput userInput : objectInput.getUsers()) {
-            User user = new User(userInput.getFirstName(), userInput.getLastName(), userInput.getEmail());
+            User user = new User(
+                    userInput.getFirstName(),
+                    userInput.getLastName(),
+                    userInput.getEmail());
             users.add(user);
             userEmailMap.put(userInput.getEmail(), user);
         }
 
         List<ExchangeRate> rates = new ArrayList<>();
         for (ExchangeInput exchangeInput : objectInput.getExchangeRates()) {
-            rates.add(new ExchangeRate(exchangeInput.getFrom(), exchangeInput.getTo(), BigDecimal.valueOf(exchangeInput.getRate())));
-            rates.add(new ExchangeRate(exchangeInput.getTo(), exchangeInput.getFrom(), BigDecimal.valueOf(1 / exchangeInput.getRate())));
+            rates.add(
+                    new ExchangeRate(
+                            exchangeInput.getFrom(),
+                            exchangeInput.getTo(),
+                            BigDecimal.valueOf(exchangeInput.getRate())));
+            rates.add(new ExchangeRate(
+                    exchangeInput.getTo(),
+                    exchangeInput.getFrom(),
+                    BigDecimal.valueOf(1 / exchangeInput.getRate())));
         }
 
         combineRates(rates);
     }
 
-    private void combineRates(List<ExchangeRate> rates) {
+    private void combineRates(final List<ExchangeRate> rates) {
         for (ExchangeRate exchangeRate : rates) {
-            exchangeRates.put(exchangeRate.getFrom() + DELIMITER + exchangeRate.getTo(), exchangeRate.getRate());
+            exchangeRates.put(
+                    exchangeRate.getFrom()
+                            + DELIMITER
+                            + exchangeRate.getTo(),
+                    exchangeRate.getRate());
         }
 
         boolean changed = true;
@@ -73,22 +92,37 @@ public class Bank {
                     ExchangeRate first = rates.get(i);
                     ExchangeRate second = rates.get(j);
 
-                    if (first.getTo().equals(second.getFrom()) && !first.getFrom().equals(second.getTo())) {
-                        if (!exchangeRates.containsKey(first.getFrom() + DELIMITER + second.getTo())) {
+                    if (first.getTo().equals(second.getFrom())
+                            && !first.getFrom().equals(second.getTo())) {
+                        if (!exchangeRates.containsKey(
+                                first.getFrom() + DELIMITER + second.getTo())) {
                             changed = true;
 
-                            exchangeRates.put(first.getFrom() + DELIMITER + second.getTo(), first.getRate().multiply(second.getRate()));
-                            ExchangeRate exchangeRate = new ExchangeRate(first.getFrom(), second.getTo(), first.getRate().multiply(second.getRate()));
+                            exchangeRates.put(
+                                    first.getFrom() + DELIMITER + second.getTo(),
+                                    first.getRate().multiply(second.getRate()));
+                            ExchangeRate exchangeRate =
+                                    new ExchangeRate(
+                                            first.getFrom(),
+                                            second.getTo(),
+                                            first.getRate().multiply(second.getRate()));
                             rates.add(exchangeRate);
                         }
                     }
 
-                    if (second.getTo().equals(first.getFrom()) && !second.getFrom().equals(first.getTo())) {
-                        if (!exchangeRates.containsKey(second.getFrom() + DELIMITER + first.getTo())) {
+                    if (second.getTo().equals(first.getFrom())
+                            && !second.getFrom().equals(first.getTo())) {
+                        if (!exchangeRates.containsKey(
+                                second.getFrom() + DELIMITER + first.getTo())) {
                             changed = true;
 
-                            exchangeRates.put(second.getFrom() + DELIMITER + first.getTo(), first.getRate().multiply(second.getRate()));
-                            ExchangeRate exchangeRate = new ExchangeRate(second.getFrom(), first.getTo(), first.getRate().multiply(second.getRate()));
+                            exchangeRates.put(
+                                    second.getFrom() + DELIMITER + first.getTo(),
+                                    first.getRate().multiply(second.getRate()));
+                            ExchangeRate exchangeRate =
+                                    new ExchangeRate(second.getFrom(),
+                                            first.getTo(),
+                                            first.getRate().multiply(second.getRate()));
                             rates.add(exchangeRate);
                         }
                     }
@@ -98,11 +132,25 @@ public class Bank {
         }
     }
 
-    public Account getAccount(String account) {
+    /**
+     * Get account by IBAN.
+     * @param account The IBAN.
+     * @return The account.
+     */
+    public final Account getAccount(final String account) {
         return accountIBANMap.get(account);
     }
 
-    public Account getAccount(String email, String aliasName, boolean global) {
+    /**
+     * Get account by alias, if exists, or by IBAN.
+     * @param email The email of the user which set the alias.
+     * @param aliasName The alias, if exists, or the IBAN.
+     * @param global If alias is global.
+     * @return The account.
+     */
+    public final Account getAccount(final String email,
+                                    final String aliasName,
+                                    final boolean global) {
         String account;
         if (!global) {
             Alias alias = new Alias(aliasName, email);
@@ -111,40 +159,79 @@ public class Bank {
             account = globalAliasMap.get(aliasName);
         }
 
-        if (account == null)
+        if (account == null) {
             account = aliasName;
+        }
 
         return getAccount(account);
     }
 
-    public Account getAlias(String alias) {
+    /**
+     * Get global alias.
+     * @param alias The alias.
+     * @return The account.
+     */
+    public final Account getAlias(final String alias) {
         String account = globalAliasMap.get(alias);
 
-        if (account == null)
+        if (account == null) {
             account = alias;
+        }
 
         return getAccount(account);
     }
-    public void setAlias(String user, String aliasName, String IBAN) {
+
+    /**
+     * Set personal alias.
+     * @param user The user which sets the alias.
+     * @param aliasName The alias.
+     * @param iban The iban.
+     */
+    public final void setAlias(final String user,
+                               final String aliasName,
+                               final String iban) {
         Alias alias = new Alias(aliasName, user);
-        aliasMap.put(alias, IBAN);
+        aliasMap.put(alias, iban);
     }
 
-    public void setAlias(String aliasName, String IBAN) {
-        globalAliasMap.put(aliasName, IBAN);
+    /**
+     * Set global alias.
+     * @param aliasName The alias.
+     * @param iban The iban.
+     */
+    public final void setAlias(final String aliasName,
+                         final String iban) {
+        globalAliasMap.put(aliasName, iban);
     }
 
-    public User getUser(String email) {
+    /**
+     * Get user by email.
+     * @param email The email.
+     * @return The user.
+     */
+    public final User getUser(final String email) {
         return userEmailMap.get(email);
     }
 
-    public void addAccount(Account account, User user) {
+    /**
+     * Add account to user.
+     * @param account The account.
+     * @param user The user.
+     */
+    public final void addAccount(final Account account,
+                                 final User user) {
         user.getAccounts().add(account);
-        accountIBANMap.put(account.getIBAN(), account);
+        accountIBANMap.put(account.getIban(), account);
         userAccountMap.put(account, user);
     }
 
-    public void addCard(Account account, Card card) {
+    /**
+     * Add card to account.
+     * @param account The account.
+     * @param card The user.
+     */
+    public final void addCard(final Account account,
+                              final Card card) {
         if (account.getCards() != null) {
             account.getCards().add(card);
             cardNumberMap.put(card.getCardNumber(), card);
@@ -152,49 +239,100 @@ public class Bank {
         }
     }
 
-    public User getUser(Account account) {
+    /**
+     * Get user of the account.
+     * @param account The account.
+     * @return The user.
+     */
+    public final User getUser(final Account account) {
         return userAccountMap.get(account);
     }
 
-    public void deleteAccount(User user, Account account) {
+    /**
+     * Delete account of a user.
+     * @param user The user.
+     * @param account The account.
+     */
+    public final void deleteAccount(final User user,
+                              final Account account) {
         for (Card card : account.getCards()) {
             deleteCard(card, account);
         }
 
         user.getAccounts().remove(account);
-        accountIBANMap.remove(account.getIBAN());
+        accountIBANMap.remove(account.getIban());
         userAccountMap.remove(account);
     }
 
-    public void deleteCard(Card card, Account account) {
+    /**
+     * Delete card of an account.
+     * @param card The card.
+     * @param account The account.
+     */
+    public final void deleteCard(final Card card, final Account account) {
         account.getCards().remove(card);
         cardNumberMap.remove(card.getCardNumber());
         accountCardMap.remove(card);
     }
 
-    public Card getCard(String card) {
+    /**
+     * Get card by card number.
+     * @param card The card number.
+     * @return The card.
+     */
+    public final Card getCard(final String card) {
         return cardNumberMap.get(card);
     }
 
-    public Account getAccount(Card card) {
+    /**
+     * Get the account which owns a card.
+     * @param card The card.
+     * @return The account.
+     */
+    public final Account getAccount(final Card card) {
         return accountCardMap.get(card);
     }
 
-    public User getCardUser(Card card) {
+    /**
+     * Get the user which owns a card.
+     * @param card The card.
+     * @return The user.
+     */
+    public final User getCardUser(final Card card) {
         Account account = getAccount(card);
         return getUser(account);
     }
 
-    public Double getRate(String from, String to) {
-        return exchangeRates.get(from + DELIMITER + to).doubleValue();
+    /**
+     * Get the rate from a currency to another.
+     * @param from From currency.
+     * @param to To currency.
+     * @return The rate.
+     */
+    public final Double getRate(final String from,
+                                final String to) {
+        return exchangeRates
+                .get(from + DELIMITER + to).doubleValue();
     }
 
-    public Double getAmount(Double amount, String from, String to) {
-        if (amount == null)
+    /**
+     * Get the amount transformed from a currency to
+     * another.
+     * @param amount The amount.
+     * @param from From currency;
+     * @param to To currency;
+     * @return The amount.
+     */
+    public final Double getAmount(final Double amount,
+                                  final String from,
+                                  final String to) {
+        if (amount == null) {
             return null;
+        }
 
-        if (to.equals(from))
+        if (to.equals(from)) {
             return amount;
+        }
 
         Double rate = getRate(from, to);
 

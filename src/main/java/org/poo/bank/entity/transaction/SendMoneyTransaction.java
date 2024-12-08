@@ -1,7 +1,6 @@
 package org.poo.bank.entity.transaction;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.bank.visitor.ObjectNodeVisitor;
@@ -14,7 +13,13 @@ public class SendMoneyTransaction extends Transaction {
     private String senderIBAN;
     private TransferType transferType;
 
-    public SendMoneyTransaction(String description, Integer timestamp, Double amount, String currency, String receiverIBAN, String senderIBAN, TransferType transferType) {
+    public SendMoneyTransaction(final String description,
+                                final Integer timestamp,
+                                final Double amount,
+                                final String currency,
+                                final String receiverIBAN,
+                                final String senderIBAN,
+                                final TransferType transferType) {
         super(description, timestamp);
         this.amount = amount + " " + currency;
         this.receiverIBAN = receiverIBAN;
@@ -22,8 +27,14 @@ public class SendMoneyTransaction extends Transaction {
         this.transferType = transferType;
     }
 
+    /**
+     * Double dispatch for creating object node
+     * representation of the transaction.
+     * @param objectNodeVisitor The transaction.
+     * @return The object node.
+     */
     @Override
-    public ObjectNode accept(ObjectNodeVisitor objectNodeVisitor) {
+    public ObjectNode accept(final ObjectNodeVisitor objectNodeVisitor) {
         return objectNodeVisitor.toObjectNode(this);
     }
 }

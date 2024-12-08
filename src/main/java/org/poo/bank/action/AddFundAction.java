@@ -7,12 +7,13 @@ import org.poo.fileio.CommandInput;
 
 public class AddFundAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             Account account = bank.getAccount(commandInput.getAccount());
 
-            if (account == null)
+            if (account == null) {
                 throw new RuntimeException("User not found");
+            }
 
             account.addBalance(commandInput.getAmount());
         } catch (RuntimeException e) {

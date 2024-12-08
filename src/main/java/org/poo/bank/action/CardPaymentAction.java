@@ -14,10 +14,11 @@ import org.poo.utils.Utils;
 
 public class CardPaymentAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
-            if (commandInput.getEmail() == null)
+            if (commandInput.getEmail() == null) {
                 throw new RuntimeException("User not found");
+            }
 
             Card card = bank.getCard(commandInput.getCardNumber());
 
@@ -62,7 +63,7 @@ public class CardPaymentAction extends Action {
                         bank.deleteCard(card, account);
                         TransactionNotifier.notify(
                                 new DeleteCardTransaction(
-                                        account.getIBAN(),
+                                        account.getIban(),
                                         card.getCardNumber(),
                                         card.getOwnerEmail(),
                                         commandInput.getTimestamp()),
@@ -71,7 +72,7 @@ public class CardPaymentAction extends Action {
 
                         bank.addCard(account, newCard);
                         TransactionNotifier.notify(new CreateCardTransaction(
-                                        account.getIBAN(),
+                                        account.getIban(),
                                         newCard.getCardNumber(),
                                         user.getEmail(),
                                         commandInput.getTimestamp()),
@@ -80,11 +81,15 @@ public class CardPaymentAction extends Action {
                     }
                 }
                 case TRANSFER_TYPE_FROZEN_CARD -> TransactionNotifier.notify(
-                        new CardStatusTransaction(TransactionMessage.TRANSACTION_MESSAGE_CARD_STATUS,
+                        new CardStatusTransaction(
+                                TransactionMessage.TRANSACTION_MESSAGE_CARD_STATUS,
                                 CardStatus.CARD_STATUS_FROZEN,
                                 commandInput.getTimestamp()),
                         user,
                         account);
+                default -> {
+                    return null;
+                }
             }
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());

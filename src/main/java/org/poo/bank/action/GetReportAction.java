@@ -11,27 +11,28 @@ import org.poo.fileio.CommandInput;
 import java.util.List;
 
 public class GetReportAction extends Action {
-    private static final ObjectNodeVisitor objectNodeConverter = new ObjectNodeConverter();
+    private static final ObjectNodeVisitor OBJECT_NODE_CONVERTER = new ObjectNodeConverter();
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             Account account = bank.getAccount(commandInput.getAccount());
 
-            if (account == null)
+            if (account == null) {
                 throw new RuntimeException("Account not found");
+            }
 
             List<Transaction> transactions = account.getTransactions();
 
             transactions = transactions.stream()
                     .filter(t ->
-                            t.getTimestamp() >= commandInput.getStartTimestamp() &&
-                                    t.getTimestamp() <= commandInput.getEndTimestamp())
+                            t.getTimestamp() >= commandInput.getStartTimestamp()
+                                    && t.getTimestamp() <= commandInput.getEndTimestamp())
                     .toList();
 
             ObjectNode objectNode = getMapper().createObjectNode();
             ObjectNode accountNode = getMapper().createObjectNode();
-            accountNode.put("transactions", objectNodeConverter.toArrayNode(transactions));
-            accountNode.put("IBAN", account.getIBAN());
+            accountNode.put("transactions", OBJECT_NODE_CONVERTER.toArrayNode(transactions));
+            accountNode.put("IBAN", account.getIban());
             accountNode.put("balance", account.getBalance());
             accountNode.put("currency", account.getCurrency());
 

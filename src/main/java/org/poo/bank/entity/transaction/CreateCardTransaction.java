@@ -12,18 +12,30 @@ public class CreateCardTransaction extends Transaction implements ObjectNodeAcce
     private String account;
     private String card;
     private String cardHolder;
-    public CreateCardTransaction(String account, String card, String cardHolder, Integer timestamp) {
-        super(TransactionMessage.TRANSACTION_MESSAGE_CARD_CREATED.getValue(), timestamp);
+    public CreateCardTransaction(final String account,
+                                 final String card,
+                                 final String cardHolder,
+                                 final Integer timestamp) {
+        super(TransactionMessage.TRANSACTION_MESSAGE_CARD_CREATED
+                .getValue(),
+                timestamp);
         this.account = account;
         this.card = card;
         this.cardHolder = cardHolder;
     }
-    public CreateCardTransaction(TransactionMessage message, Integer timestamp) {
+    public CreateCardTransaction(final TransactionMessage message,
+                                 final Integer timestamp) {
         super(message.getValue(), timestamp);
     }
 
+    /**
+     * Double dispatch for creating object node
+     * representation of the transaction.
+     * @param objectNodeVisitor The transaction.
+     * @return The object node.
+     */
     @Override
-    public ObjectNode accept(ObjectNodeVisitor objectNodeVisitor) {
+    public ObjectNode accept(final ObjectNodeVisitor objectNodeVisitor) {
         return objectNodeVisitor.toObjectNode(this);
     }
 }

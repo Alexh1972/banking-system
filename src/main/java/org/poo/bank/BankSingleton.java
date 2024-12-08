@@ -1,11 +1,11 @@
 package org.poo.bank;
 
-import org.poo.bank.Bank;
-
 public class BankSingleton {
-    private static final Bank bank = new Bank();
+    private static final Bank BANK = new Bank();
+    protected BankSingleton() {
 
+    }
     public static Bank getInstance() {
-        return bank;
+        return BANK;
     }
 }

@@ -8,14 +8,20 @@ public enum CardStatus {
 
     private final String value;
 
-    CardStatus(String value) {
+    CardStatus(final String value) {
         this.value = value;
     }
 
-    public static CardStatus getCardStatus(String value) {
+    /**
+     * Gets the card status by a given string.
+     * @param value The string.
+     * @return The card status.
+     */
+    public static CardStatus getCardStatus(final String value) {
         for (CardStatus status : CardStatus.values()) {
-            if (status.getValue().equals(value))
+            if (status.getValue().equals(value)) {
                 return status;
+            }
         }
 
         return CARD_STATUS_ACTIVE;

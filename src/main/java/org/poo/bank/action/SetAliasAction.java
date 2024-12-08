@@ -6,10 +6,11 @@ import org.poo.fileio.CommandInput;
 
 public class SetAliasAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
-            if (commandInput.getEmail() == null)
+            if (commandInput.getEmail() == null) {
                 throw new RuntimeException("User not found");
+            }
 
             bank.setAlias(commandInput.getAlias(), commandInput.getAccount());
         } catch (RuntimeException e) {

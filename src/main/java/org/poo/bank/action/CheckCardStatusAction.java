@@ -13,12 +13,13 @@ import org.poo.fileio.CommandInput;
 
 public class CheckCardStatusAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             Card card = bank.getCard(commandInput.getCardNumber());
 
-            if (card == null)
+            if (card == null) {
                 throw new RuntimeException("Card not found");
+            }
 
             Account account = bank.getAccount(card);
             User user = bank.getUser(account);

@@ -10,15 +10,15 @@ import org.poo.bank.visitor.ObjectNodeVisitor;
 import org.poo.fileio.CommandInput;
 
 public class GetUsersAction extends Action {
-    private static final ObjectNodeVisitor objectNodeConverter = new ObjectNodeConverter();
+    private static final ObjectNodeVisitor OBJECT_NODE_CONVERTER = new ObjectNodeConverter();
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         ObjectMapper mapper = getMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         ArrayNode arrayNode = mapper.createArrayNode();
 
         for (User user : bank.getUsers()) {
-            arrayNode.add(user.accept(objectNodeConverter));
+            arrayNode.add(user.accept(OBJECT_NODE_CONVERTER));
         }
 
         objectNode.put("output", arrayNode);

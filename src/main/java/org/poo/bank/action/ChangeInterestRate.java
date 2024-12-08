@@ -11,20 +11,23 @@ import org.poo.fileio.CommandInput;
 
 public class ChangeInterestRate extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             Account account = bank.getAccount(commandInput.getAccount());
 
-            if (account == null)
+            if (account == null) {
                 throw new RuntimeException("Account not found");
+            }
 
-            if (!account.getAccountType().equals(AccountType.ACCOUNT_TYPE_SAVINGS))
+            if (!account.getAccountType().equals(AccountType.ACCOUNT_TYPE_SAVINGS)) {
                 throw new RuntimeException("This is not a savings account");
+            }
 
             account.setInterestRate(commandInput.getInterestRate());
             User user = bank.getUser(account);
 
-            TransactionNotifier.notify(new ChangeInterestRateTransaction(
+            TransactionNotifier.notify(
+                    new ChangeInterestRateTransaction(
                             commandInput.getInterestRate(),
                             commandInput.getTimestamp()),
                     user,
