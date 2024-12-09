@@ -55,18 +55,13 @@ public final class Main {
                 sorted(Comparator.comparingInt(Main::fileConsumer))
                 .toList();
 
-        int i = 0;
         for (File file : sortedFiles) {
             String filepath = CheckerConstants.OUT_PATH + file.getName();
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-//                if (i == 18) {
-                 System.out.println(filepath);
                     action(file.getName(), filepath);
-//                }
             }
-            i++;
         }
 
         Checker.calculateScore();

@@ -1,45 +1,86 @@
-# Project Assignment POO  - J. POO Morgan - Phase One
+# J. POO Morgan Chase & Co.
 
-![](https://s.yimg.com/ny/api/res/1.2/aN0SfZTtLF5hLNO0wIN3gg--/YXBwaWQ9aGlnaGxhbmRlcjt3PTcwNTtoPTQyNztjZj13ZWJw/https://o.aolcdn.com/hss/storage/midas/b23d8b7f62a50a7b79152996890aa052/204855412/fit.gif)
+## Descriere
 
-#### Assignment Link: [https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/2024/proiect-e1](https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/2024/proiect-e1)
+J. POO Morgan Chase & Co. are in spate un sistem inovator de e-banking care
+are functionalitatile de baza a unei aplicatii de banking. Avand in vedere
+volumul mare de date, se doreste ca acest sistem sa fie unul eficient si
+sigur, avand in vedere gestionarea corecta a conturilor fiecarui utilizator
+si punerea la dispozitie a mai multor actiuni esentiale pentru utilizatori.
 
-## Skel Structure
+## Implementare
 
-* src/
-    * checker/ - checker files
-    * fileio/ - contains classes used to read data from the json files
-    * main/
-        * Main - the Main class runs the checker on your implementation. Add the entry point to your implementation in it. Run Main to test your implementation from the IDE or from command line.
-        * Test - run the main method from Test class with the name of the input file from the command line and the result will be written
-          to the out.txt file. Thus, you can compare this result with ref.
-* input/ - contains the tests in JSON format
-* ref/ - contains all reference output for the tests in JSON format
+Actiunile in cadrul acestui sistem sunt reprezentate de cate o clasa ce extinde
+o clasa de baza `Action` care **suprascrie** metoda care va executa corespunzator
+acea actiune. Crearea unei actiuni este facilitata printr-un `Factory` care
+va transforma numele actiunii intr-o instanta a actiunii. In acest mod se
+va incepe intr-un mod facil executia actiunii, prin apelarea metodei `execute()`.
 
-## Tests
+**Banca** si resursele acesteia, cum ar fi **baza de date** si relatiile dintre 
+entitati pot fi retinute intr-o clasa de tip `Singleton`. Relatiile dintre
+entitati sunt stocate in **hash tabel-uri**, astfel incat query-urile sa se
+poata face intr-un mod rapid.
 
-Tests Basic 1 - 8: Infrastructure \
-Tests Functional 9 - 17: Advanced \
-Tests Flow 18 - 20: Large Input
+**Entitatile** acestei banci sunt reprezentate de **useri** care pot avea multiple
+**conturi** care au asociate mai multe **carduri** (generale sau de unica 
+folosinta). Fiecarui cont si user, le vor fi asociate mai multe **tranzactii** care
+fac posibila observarea actiunilor in timp a fiecarui utilizator. Entitatile,
+pentru a avea un raspuns detaliat in cadrul fiecarei actiuni, vor trebui
+convertite in format **JSON**, iar acest lucru va fi posibil prin implementarea
+unui `Visitator` care contine o metoda pentru fiecare dintre entitati. Cardurile
+si conturile vor avea campuri care nu trebuie neaparat initializate odata cu
+instanta, folosindu-se astfel de un `Builder`.
 
-1. test01_create - 2p
-2. test02_delete - 2p
-3. test03_one_time_card - 2p
-4. test04_funds - 2p
-5. test05_money_flow - 2p
-6. test06_non_existing - 2p
-7. test07_send_money_part1 - 3p
-8. test08_send_money_part2 - 3p
-9. test09_print_transactions - 3p
-10. test10_errors - 3p
-11. test11_card_status - 5p
-12. test12_continuous_payments - 5p
-13. test13_savings_account - 5p
-14. test14_split_payments - 5p
-15. test15_every_payment - 5p
-16. test16_report - 5p
-17. test17_spendings_report - 5p
-18. test18_large_input_1 - 7p
-19. test19_large_input_2 - 7p
-20. test19_large_input_3 - 7p
+Pentru a avea un istoric al fiecarei actiuni, rezultatele sau erorile acestora
+sunt retinute prin intermediul **tranzactiilor**. Pentru ca o actiune poate
+genera tranzactii in cadrul mai multor conturi si utilizatori, acestia vor
+fi notificati cu ajutorul unui **Observer**. Utilizatorii si conturile
+vor trebui doar sa isi adauge tranzactiile intr-o lista in momentul in care
+sunt notificati de catre banca. Tranzactiile vor fi apoi afisate in cazul in
+care se doreste **printarea** acestora sau **filtrarea** in functie de timestamp 
+sau  filtrarea doar a tranzactiilor generate de plata cu cardul, care vor 
+informa utilizatorul ce sume a platit fiecarui comerciant.
+
+## Actiuni
+
+- **Cont:** crearea, stergerea conturilor, adaugarea de fonduri sau alias-uri.
+Crearea conturilor si adaugarea de fonduri, alias-uri, in cazul in care sunt 
+facute de un utilizator existent, vor fi mereu valabile, dar stergerea va crea
+erori, reflectate prin intermediul tranzactiilor, in momentul in care se doreste
+stergerea unui cont cu bani. Crearea unui cont va adauga o tranzactie corespunzatoare.
+
+- **Card:** crearea, stergerea cardurilor si verificarea statusului. Fiecare
+dintre aceste actiuni va genera o tranzactie despre rezultatul actiunii.
+Verificarea unui card consta in verificarea daca contul asociat are o suma
+de bani mai mare decat balanta minima, iar in cazul in care nu se respecta
+aceasta conditie, cardul va fi blocat.
+
+- **Informatii despre utilizator / cont:** printarea utilizatorului si a
+tranzactiilor asociate acestuia, filtrate, eventual, dupa timestamp sau dupa
+tipul acestora, astfel utilizatorul poate sa isi vada cheltuielile totale
+pentru fiecare comerciant.
+
+- **Plati:** de tipul cont-cont, cont-comerciant sau conturi-nimeni (impartirea
+banilor aparent evapora banii). In cazul in care un cont incearca sa plateasca,
+iar balanta este sub cea minima, plata nu se va efectua, iar aceasta va genera
+o tranzactie corespunzatoare, chiar si in cazul in care, in cadrul impartirii
+banilor, un cont ramane fara bani, toti utilizatorii vor fi notificati. Daca
+plata se face cu cardul, catre un comerciant, se vor verifica mai multe lucruri:
+daca balanta este sub cea minima, cardul va fi blocat, iar daca balanta se apropie
+foarte mult de acest minim, cardul va avea un status de tip 'warning'.
+
+- **Dobanda:** schimbarea si incasarea dobanzii. Schimbarea dobanzii va genera
+in cadrul contului o tranzactie care va spune noua dobanda.
+
+## Transactiile existente
+
+- **Cont:** adaugarea si eroarea la stergerea acestuia, in cazul in care contul
+mai are bani in el, dar si schimbarea dobanzii contului.
+
+- **Card:** crearea si stergerea cardului cu succes sau eroare la verificarea
+statusului unui card.
+
+- **Plati:** plata cu cardul, plata catre un cont sau impartirea platii intre
+mai multe conturi, cand acestea nu au erori, dar si eroare de fonduri insuficiente
+la impartirea platilor sau la cele normale.
 
