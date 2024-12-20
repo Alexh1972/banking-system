@@ -1,35 +1,35 @@
 [ {
   "command" : "printUsers",
   "output" : [ {
-    "firstName" : "Meghan",
-    "lastName" : "Richardson",
-    "email" : "Meghan_Richardson@gmail.us",
+    "firstName" : "Simion",
+    "lastName" : "Mazilescu",
+    "email" : "Simion_Mazilescu@yahoo.ro",
     "accounts" : [ {
       "IBAN" : "RO58POOB7344468893732422",
-      "balance" : 229.0,
-      "currency" : "USD",
+      "balance" : 6720.0,
+      "currency" : "RON",
       "type" : "classic",
       "cards" : [ ]
     }, {
       "IBAN" : "RO69POOB6209498372540635",
-      "balance" : 541.0,
-      "currency" : "USD",
+      "balance" : 1840.0,
+      "currency" : "RON",
       "type" : "classic",
       "cards" : [ ]
     } ]
   }, {
-    "firstName" : "Matthew",
-    "lastName" : "Santiago",
-    "email" : "Matthew_Santiago@hotmail.us",
+    "firstName" : "Anthony",
+    "lastName" : "Graham",
+    "email" : "Anthony_Graham@yahoo.us",
     "accounts" : [ {
       "IBAN" : "RO90POOB5450777208072365",
-      "balance" : 631.0,
+      "balance" : 1826.0,
       "currency" : "USD",
       "type" : "classic",
       "cards" : [ ]
     }, {
       "IBAN" : "RO65POOB8944016386845896",
-      "balance" : 311.0,
+      "balance" : 15240.0,
       "currency" : "USD",
       "type" : "classic",
       "cards" : [ ]
@@ -39,13 +39,13 @@
 }, {
   "command" : "printUsers",
   "output" : [ {
-    "firstName" : "Meghan",
-    "lastName" : "Richardson",
-    "email" : "Meghan_Richardson@gmail.us",
+    "firstName" : "Simion",
+    "lastName" : "Mazilescu",
+    "email" : "Simion_Mazilescu@yahoo.ro",
     "accounts" : [ {
       "IBAN" : "RO58POOB7344468893732422",
-      "balance" : 131.7,
-      "currency" : "USD",
+      "balance" : 4959.0,
+      "currency" : "RON",
       "type" : "classic",
       "cards" : [ {
         "cardNumber" : "8207906978464446",
@@ -53,24 +53,24 @@
       } ]
     }, {
       "IBAN" : "RO69POOB6209498372540635",
-      "balance" : 552.0,
-      "currency" : "USD",
+      "balance" : 2367.0,
+      "currency" : "RON",
       "type" : "classic",
       "cards" : [ ]
     } ]
   }, {
-    "firstName" : "Matthew",
-    "lastName" : "Santiago",
-    "email" : "Matthew_Santiago@hotmail.us",
+    "firstName" : "Anthony",
+    "lastName" : "Graham",
+    "email" : "Anthony_Graham@yahoo.us",
     "accounts" : [ {
       "IBAN" : "RO90POOB5450777208072365",
-      "balance" : 631.0,
+      "balance" : 1826.0,
       "currency" : "USD",
       "type" : "classic",
       "cards" : [ ]
     }, {
       "IBAN" : "RO65POOB8944016386845896",
-      "balance" : 311.0,
+      "balance" : 15240.0,
       "currency" : "USD",
       "type" : "classic",
       "cards" : [ ]
@@ -80,70 +80,152 @@
 }, {
   "command" : "payOnline",
   "output" : {
-    "timestamp" : 23,
+    "timestamp" : 37,
     "description" : "Card not found"
   },
-  "timestamp" : 23
+  "timestamp" : 37
 }, {
-  "command" : "payOnline",
-  "output" : {
-    "timestamp" : 24,
-    "description" : "Card not found"
-  },
-  "timestamp" : 24
+  "command" : "printUsers",
+  "output" : [ {
+    "firstName" : "Simion",
+    "lastName" : "Mazilescu",
+    "email" : "Simion_Mazilescu@yahoo.ro",
+    "accounts" : [ {
+      "IBAN" : "RO58POOB7344468893732422",
+      "balance" : 20413.4,
+      "currency" : "RON",
+      "type" : "classic",
+      "cards" : [ {
+        "cardNumber" : "8207906978464446",
+        "status" : "active"
+      }, {
+        "cardNumber" : "6796819982034243",
+        "status" : "active"
+      } ]
+    }, {
+      "IBAN" : "RO69POOB6209498372540635",
+      "balance" : 9061.0,
+      "currency" : "RON",
+      "type" : "classic",
+      "cards" : [ {
+        "cardNumber" : "1322658752653937",
+        "status" : "active"
+      } ]
+    } ]
+  }, {
+    "firstName" : "Anthony",
+    "lastName" : "Graham",
+    "email" : "Anthony_Graham@yahoo.us",
+    "accounts" : [ {
+      "IBAN" : "RO90POOB5450777208072365",
+      "balance" : 1148.2142857142858,
+      "currency" : "USD",
+      "type" : "classic",
+      "cards" : [ {
+        "cardNumber" : "7901879264253296",
+        "status" : "active"
+      }, {
+        "cardNumber" : "0466992784477761",
+        "status" : "active"
+      } ]
+    }, {
+      "IBAN" : "RO65POOB8944016386845896",
+      "balance" : 13324.0,
+      "currency" : "USD",
+      "type" : "classic",
+      "cards" : [ {
+        "cardNumber" : "7004757825892043",
+        "status" : "active"
+      } ]
+    } ]
+  } ],
+  "timestamp" : 38
 }, {
-  "command" : "report",
+  "command" : "spendingsReport",
   "output" : {
     "IBAN" : "RO58POOB7344468893732422",
-    "balance" : 362.7,
-    "currency" : "USD",
+    "balance" : 20413.4,
+    "currency" : "RON",
     "transactions" : [ {
+      "timestamp" : 11,
+      "description" : "Card payment",
+      "amount" : 16.0,
+      "commerciant" : "eMAG"
+    }, {
+      "timestamp" : 12,
+      "description" : "Card payment",
+      "amount" : 1218.0,
+      "commerciant" : "Zara Home"
+    }, {
       "timestamp" : 18,
       "description" : "Card payment",
-      "amount" : 66.0,
-      "commerciant" : "Apple"
+      "amount" : 1457.4,
+      "commerciant" : "Debt Collector"
+    }, {
+      "timestamp" : 26,
+      "description" : "Card payment",
+      "amount" : 1264.2,
+      "commerciant" : "H&M"
+    } ],
+    "commerciants" : [ {
+      "commerciant" : "Debt Collector",
+      "total" : 1457.4
+    }, {
+      "commerciant" : "H&M",
+      "total" : 1264.2
+    }, {
+      "commerciant" : "Zara Home",
+      "total" : 1218.0
+    }, {
+      "commerciant" : "eMAG",
+      "total" : 16.0
     } ]
   },
-  "timestamp" : 25
+  "timestamp" : 39
 }, {
-  "command" : "report",
+  "command" : "spendingsReport",
   "output" : {
     "IBAN" : "RO69POOB6209498372540635",
-    "balance" : 1677.0,
-    "currency" : "USD",
-    "transactions" : [ {
-      "timestamp" : 17,
-      "description" : "Visit to a local healthcare clinic",
-      "senderIBAN" : "RO90POOB5450777208072365",
-      "receiverIBAN" : "RO69POOB6209498372540635",
-      "amount" : "464.0 USD",
-      "transferType" : "received"
-    } ]
+    "balance" : 9061.0,
+    "currency" : "RON",
+    "transactions" : [ ],
+    "commerciants" : [ ]
   },
-  "timestamp" : 26
+  "timestamp" : 40
 }, {
-  "command" : "report",
+  "command" : "spendingsReport",
   "output" : {
     "IBAN" : "RO90POOB5450777208072365",
-    "balance" : 1437.0,
+    "balance" : 1148.2142857142858,
     "currency" : "USD",
     "transactions" : [ {
-      "timestamp" : 17,
-      "description" : "Visit to a local healthcare clinic",
-      "senderIBAN" : "RO90POOB5450777208072365",
-      "receiverIBAN" : "RO69POOB6209498372540635",
-      "amount" : "464.0 USD",
-      "transferType" : "sent"
+      "timestamp" : 27,
+      "description" : "Card payment",
+      "amount" : 426.0,
+      "commerciant" : "Amazon"
+    } ],
+    "commerciants" : [ {
+      "commerciant" : "Amazon",
+      "total" : 426.0
     } ]
   },
-  "timestamp" : 27
+  "timestamp" : 41
 }, {
-  "command" : "report",
+  "command" : "spendingsReport",
   "output" : {
     "IBAN" : "RO65POOB8944016386845896",
-    "balance" : 459.0,
+    "balance" : 13324.0,
     "currency" : "USD",
-    "transactions" : [ ]
+    "transactions" : [ {
+      "timestamp" : 28,
+      "description" : "Card payment",
+      "amount" : 285.0,
+      "commerciant" : "Zara"
+    } ],
+    "commerciants" : [ {
+      "commerciant" : "Zara",
+      "total" : 285.0
+    } ]
   },
-  "timestamp" : 28
+  "timestamp" : 42
 } ]
