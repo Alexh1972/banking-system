@@ -3,6 +3,8 @@ package org.poo.bank.entity.transaction;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.bank.action.SplitPaymentAction;
+import org.poo.bank.entity.SplitPayment;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
@@ -15,20 +17,26 @@ public class SplitPaymentTransaction extends Transaction implements ObjectNodeAc
     private String currency;
     private Integer numberPayers;
     private List<String> involvedAccounts;
+    private String type;
+    private List<Double> amounts;
     public SplitPaymentTransaction(final Double amount,
                                    final String currency,
                                    final Integer numberPayers,
                                    final List<String> involvedAccounts,
-                                   final Integer timestamp) {
+                                   final Integer timestamp,
+                                   final String type,
+                                   final List<Double> amounts) {
         super(TransactionMessage.TRANSACTION_MESSAGE_SPLIT_PAYMENT
                 .getValue()
                 .replace("{amount|currency}",
                         String.format("%.2f", amount) + " " + currency),
                 timestamp);
-        this.amount = amount / numberPayers;
+        this.amount = amount;
         this.currency = currency;
         this.numberPayers = numberPayers;
         this.involvedAccounts = involvedAccounts;
+        this.type = type;
+        this.amounts = amounts;
     }
 
     public SplitPaymentTransaction(final Double amount,

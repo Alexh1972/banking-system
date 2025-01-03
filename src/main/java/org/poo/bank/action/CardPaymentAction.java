@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
 import org.poo.bank.BankSingleton;
 import org.poo.bank.entity.Commerciant;
+import org.poo.bank.entity.account.Associate;
+import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
@@ -34,7 +36,7 @@ public class CardPaymentAction extends Action {
             }
 
             Account account = bank.getAccount(card);
-            User user = bank.getUser(account);
+            User user = bank.getUser(commandInput.getEmail());
 
             Double amountSpent = bank.getAmount(commandInput.getAmount(),
                     commandInput.getCurrency(),
@@ -50,7 +52,19 @@ public class CardPaymentAction extends Action {
 
             Double noCashBackAmount = amountSpent;
             Double finalAmountSpent = amountSpent - cashbackAmount;
-            TransferType transferResult = account.subtractBalance(finalAmountSpent, card);
+
+            Associates associates = bank.getAssociates(account);
+            TransferType transferResult;
+            if (associates == null) {
+                transferResult = account.subtractBalance(finalAmountSpent, card);
+            } else {
+                if (associates.canPay(user, finalAmountSpent, account.getCurrency())) {
+                    transferResult = account.subtractBalance(finalAmountSpent, card);
+                    associates.updateAssociatePayment(user, noCommissionAmount, commandInput.getTimestamp());
+                } else {
+                    transferResult = TransferType.TRANSFER_TYPE_INSUFFICIENT_FUNDS;
+                }
+            }
 
             switch (transferResult) {
                 case TRANSFER_TYPE_INSUFFICIENT_FUNDS -> TransactionNotifier.notify(

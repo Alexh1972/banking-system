@@ -18,12 +18,10 @@ public class SplitPaymentErrorTransaction
                                         final Integer numberPayers,
                                         final List<String> involvedAccounts,
                                         final String errorIBAN,
-                                        final Integer timestamp) {
-        super(amount,
-                currency,
-                numberPayers,
-                involvedAccounts,
-                timestamp);
+                                        final Integer timestamp,
+                                        final String type,
+                                        final List<Double> amounts) {
+        super(amount, currency, numberPayers, involvedAccounts, timestamp, type, amounts);
 
         this.error = TransactionMessage.TRANSACTION_MESSAGE_SPLIT_PAYMENT_ERROR
                 .getValue()

@@ -48,6 +48,9 @@ public abstract class Action {
                 case "cashWithdrawal" -> new CashWithdrawalAction();
                 case "acceptSplitPayment" -> new AcceptSplitPaymentAction();
                 case "rejectSplitPayment" -> new RejectSplitPaymentAction();
+                case "changeSpendingLimit" -> new ChangeSpendingLimitAssociate();
+                case "changeDepositLimit" -> new ChangeDepositLimitAction();
+                case "businessReport" -> new GetBusinessReportAction();
                 default -> throw new IllegalArgumentException("Unexpected action value: " + action);
             };
     }

@@ -116,6 +116,26 @@ public class Bank {
         splitPayments.remove(payment);
     }
 
+    public SplitPayment getSplitPayment(User user) {
+        for (SplitPayment splitPayment : splitPayments) {
+            if (splitPayment.getAccount(user) != null) {
+                return splitPayment;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean isUsersAccount(User user, String iban) {
+        for (Account account : user.getAccounts()) {
+            if (account.getIban().equals(iban)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public Card getUsedCard(String card) {
         return usedCards.get(card);
     }
@@ -124,12 +144,22 @@ public class Bank {
         Associates associates = getAssociates(account);
 
         if (associates == null) {
-            associates = new Associates();
-            associates.getAssociates().add(new Associate(user, type));
+            associates = new Associates(account);
+            associates.addAssociate(user, type);
             associateMap.put(account, associates);
         } else {
-            associates.getAssociates().add(new Associate(user, type));
+            associates.addAssociate(user, type);
         }
+    }
+
+    public boolean isAssociate(Account account, User user) {
+        Associates associates = getAssociates(account);
+
+        if (associates == null) {
+            return false;
+        }
+
+        return associates.getAssociate(user) != null;
     }
 
     public Associates getAssociates(Account account) {

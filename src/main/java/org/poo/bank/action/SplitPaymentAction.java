@@ -82,7 +82,7 @@ public class SplitPaymentAction extends Action {
             }
         }
 
-        SplitPayment splitPayment = new SplitPayment(commandInput.getAccounts(), amounts, commandInput.getCurrency());
+        SplitPayment splitPayment = new SplitPayment(commandInput.getAccounts(), amounts, commandInput.getCurrency(), paymentType.getValue(), commandInput.getTimestamp());
         bank.addSplitPayment(splitPayment);
         return null;
     }

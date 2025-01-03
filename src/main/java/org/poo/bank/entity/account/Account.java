@@ -13,9 +13,7 @@ import org.poo.bank.entity.user.User;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Data
 public class Account implements ObjectNodeAcceptor {
@@ -149,6 +147,7 @@ public class Account implements ObjectNodeAcceptor {
      */
     public final void transactionUpdate(final Transaction transaction) {
         transactions.add(transaction);
+        transactions.sort(Comparator.comparingInt(Transaction::getTimestamp));
     }
 
     @Override

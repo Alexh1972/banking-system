@@ -2,6 +2,7 @@ package org.poo.bank.action;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
+import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
@@ -33,6 +34,13 @@ public class DeleteCardAction extends Action {
 
             if (user == null || !user.equals(bank.getUser(commandInput.getEmail()))) {
                 throw new RuntimeException("User not found");
+            }
+
+            Associates associates = bank.getAssociates(account);
+            if (associates != null) {
+                if (!associates.getAssociate(user).getType().getCanDeleteAnyCard() && !card.getOwnerEmail().equals(user.getEmail())) {
+                    throw new RuntimeException("You are not authorized to make this transaction.");
+                }
             }
 
             bank.deleteCard(card, account);

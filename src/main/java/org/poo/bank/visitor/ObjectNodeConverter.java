@@ -3,6 +3,9 @@ package org.poo.bank.visitor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.poo.bank.BankSingleton;
+import org.poo.bank.entity.account.Associate;
+import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.transaction.*;
 import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
@@ -10,6 +13,7 @@ import org.poo.bank.entity.account.card.Card;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ObjectNodeConverter implements ObjectNodeVisitor {
@@ -192,8 +196,8 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     public final ObjectNode toObjectNode(final SplitPaymentTransaction transaction) {
         ObjectNode objectNode = toObjectNode((Transaction) transaction);
 
-        objectNode.put("amount", transaction.getAmount());
         objectNode.put("currency", transaction.getCurrency());
+        objectNode.put("splitPaymentType", transaction.getType());
 
         ArrayNode arrayNode = MAPPER.createArrayNode();
         for (String account : transaction.getInvolvedAccounts()) {
@@ -201,6 +205,13 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         }
 
         objectNode.put("involvedAccounts", arrayNode);
+
+        ArrayNode amountNode = MAPPER.createArrayNode();
+        for (Double account : transaction.getAmounts()) {
+            amountNode.add(account);
+        }
+
+        objectNode.put("amountForUsers", amountNode);
         return objectNode;
     }
 

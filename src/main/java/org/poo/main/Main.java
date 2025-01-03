@@ -61,7 +61,7 @@ public final class Main {
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-                if (i == 6)
+                if (i == 8)
                     action(file.getName(), filepath);
             }
             i++;

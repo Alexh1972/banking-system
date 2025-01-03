@@ -7,12 +7,17 @@ import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.user.User;
 import org.poo.fileio.CommandInput;
 
-public class AddAccountAssociateAction extends Action {
+public class ChangeDepositLimitAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
         try {
             Account account = bank.getAccount(commandInput.getAccount());
-            bank.addAssociate(account, commandInput.getEmail(), commandInput.getRole());
+            User user = bank.getUser(account);
+            Associates associates = bank.getAssociates(account);
+
+            if (associates.changeDepositLimit(user, commandInput.getAmount())) {
+
+            }
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
         }
