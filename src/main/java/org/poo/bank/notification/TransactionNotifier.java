@@ -1,7 +1,7 @@
 package org.poo.bank.notification;
 
 import lombok.Data;
-import org.poo.bank.entity.User;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.transaction.Transaction;
 

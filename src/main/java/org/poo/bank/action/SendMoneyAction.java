@@ -2,7 +2,7 @@ package org.poo.bank.action;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
-import org.poo.bank.entity.User;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.transaction.InsufficientFundsTransaction;
 import org.poo.bank.entity.transaction.SendMoneyTransaction;
@@ -21,13 +21,16 @@ public class SendMoneyAction extends Action {
             User receiverUser = bank.getUser(receiver);
 
             if (sender == null || receiver == null) {
-                return null;
+                throw new RuntimeException("User not found");
             }
 
             Double amount = bank.getAmount(commandInput.getAmount(),
                     sender.getCurrency(),
                     receiver.getCurrency());
-            if (sender.subtractBalance(commandInput.getAmount())) {
+
+            Double amountSent = commandInput.getAmount();
+            amountSent += sender.getServicePlan().getCommission(amountSent, sender.getCurrency());
+            if (sender.subtractBalance(amountSent)) {
                 receiver.addBalance(amount);
 
                 if (receiver.getIban().equals(sender.getIban())) {

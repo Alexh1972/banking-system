@@ -3,6 +3,10 @@ package org.poo.bank.entity.transaction;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.bank.Bank;
+import org.poo.bank.BankSingleton;
+import org.poo.bank.entity.Commerciant;
+import org.poo.bank.entity.account.Account;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 @Getter
@@ -10,12 +14,22 @@ import org.poo.bank.visitor.ObjectNodeVisitor;
 public class CardPaymentTransaction extends Transaction implements ObjectNodeAcceptor {
     private String commerciant;
     private Double amount;
-    public CardPaymentTransaction(final String commerciant,
+    private String currency;
+    private Double amountNoCashback;
+    public CardPaymentTransaction(final String commerciantName,
                                   final Double amount,
-                                  final Integer timestamp) {
+                                  final Double amountNoCashback,
+                                  final Integer timestamp,
+                                  final Account account) {
         super(TransactionMessage.TRANSACTION_MESSAGE_CARD_PAYMENT.getValue(), timestamp);
-        this.commerciant = commerciant;
+        this.commerciant = commerciantName;
         this.amount = amount;
+        this.amountNoCashback = amountNoCashback;
+        this.currency = account.getCurrency();
+
+        Bank bank = BankSingleton.getInstance();
+        Commerciant commerciant = bank.getCommerciant(commerciantName);
+        commerciant.getCashbackStrategy().updateCashback(account, commerciant);
     }
 
     /**

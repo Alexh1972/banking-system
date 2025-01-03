@@ -2,7 +2,8 @@ package org.poo.bank.action;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
-import org.poo.bank.entity.User;
+import org.poo.bank.entity.account.Associate;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.AccountType;
 import org.poo.bank.entity.transaction.CreateAccountTransaction;
@@ -32,7 +33,13 @@ public class AddAccountAction extends Action {
                     .balance(0.0)
                     .minimumBalance(0.0)
                     .interestRate(commandInput.getInterestRate())
+                    .occupation(user.getOccupation())
+                    .email(commandInput.getEmail())
                     .build();
+
+            if (account.getAccountType().equals(AccountType.ACCOUNT_TYPE_BUSINESS)) {
+                bank.addAssociate(account, user, Associate.AssociateType.OWNER.getName());
+            }
 
             bank.addAccount(account, user);
             TransactionNotifier.notify(

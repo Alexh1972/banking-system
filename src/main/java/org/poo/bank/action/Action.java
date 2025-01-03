@@ -42,6 +42,12 @@ public abstract class Action {
                 case "spendingsReport" -> new GetSpendingsReportAction();
                 case "changeInterestRate" -> new ChangeInterestRate();
                 case "addInterest" -> new AddInterestAction();
+                case "upgradePlan" -> new UpgradePlanAction();
+                case "withdrawSavings" -> new WithdrawSavingsAction();
+                case "addNewBusinessAssociate" -> new AddAccountAssociateAction();
+                case "cashWithdrawal" -> new CashWithdrawalAction();
+                case "acceptSplitPayment" -> new AcceptSplitPaymentAction();
+                case "rejectSplitPayment" -> new RejectSplitPaymentAction();
                 default -> throw new IllegalArgumentException("Unexpected action value: " + action);
             };
     }

@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.entity.transaction.*;
-import org.poo.bank.entity.User;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class ObjectNodeConverter implements ObjectNodeVisitor {
@@ -65,7 +67,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         ObjectNode objectNode = MAPPER.createObjectNode();
 
         objectNode.put("IBAN", account.getIban());
-        objectNode.put("balance", account.getBalance());
+        objectNode.put("balance", BigDecimal.valueOf(account.getBalance()).setScale(2, RoundingMode.HALF_UP).doubleValue());
         objectNode.put("currency", account.getCurrency());
         objectNode.put("type", account.getAccountType().getValue());
 
@@ -229,5 +231,41 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         }
 
         return arrayNode;
+    }
+
+    @Override
+    public ObjectNode toObjectNode(WithdrawSavingsTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+
+        objectNode.put("classicAccountIBAN", transaction.getClassicAccountIBAN());
+        objectNode.put("amount", transaction.getAmount());
+        objectNode.put("savingsAccountIBAN", transaction.getSavingsAccountIBAN());
+        return objectNode;
+    }
+
+    @Override
+    public ObjectNode toObjectNode(UpgradePlanTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+
+        objectNode.put("newPlanType", transaction.getNewPlanType());
+        objectNode.put("accountIBAN", transaction.getAccountIban());
+        return objectNode;
+    }
+
+    @Override
+    public ObjectNode toObjectNode(CashWithdrawalTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+
+        objectNode.put("amount", transaction.getAmount());
+        return objectNode;
+    }
+
+    @Override
+    public ObjectNode toObjectNode(AddInterestTransaction transaction) {
+        ObjectNode objectNode = toObjectNode((Transaction) transaction);
+
+        objectNode.put("amount", transaction.getAmount());
+        objectNode.put("currency", transaction.getCurrency());
+        return objectNode;
     }
 }

@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum AccountType {
     ACCOUNT_TYPE_SAVINGS("savings"),
-    ACCOUNT_TYPE_CLASSIC("classic");
+    ACCOUNT_TYPE_CLASSIC("classic"),
+    ACCOUNT_TYPE_BUSINESS("business");
 
     private final String value;
 

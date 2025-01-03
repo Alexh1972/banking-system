@@ -12,6 +12,8 @@ import org.poo.bank.visitor.ObjectNodeConverter;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 import org.poo.fileio.CommandInput;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +78,7 @@ public class GetSpendingsReportAction extends Action {
             ObjectNode accountNode = getMapper().createObjectNode();
             accountNode.put("transactions", OBJECT_NODE_CONVERTER.toArrayNode(transactions));
             accountNode.put("IBAN", account.getIban());
-            accountNode.put("balance", account.getBalance());
+            accountNode.put("balance", BigDecimal.valueOf(account.getBalance()).setScale(2, RoundingMode.HALF_UP).doubleValue());
             accountNode.put("commerciants", arrayNode);
             accountNode.put("currency", account.getCurrency());
 

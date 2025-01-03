@@ -3,10 +3,13 @@ package org.poo.bank.entity.account;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Builder;
 import lombok.Data;
+import org.poo.bank.Bank;
+import org.poo.bank.BankSingleton;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;
 import org.poo.bank.entity.transaction.Transaction;
 import org.poo.bank.entity.transaction.TransferType;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
@@ -25,13 +28,18 @@ public class Account implements ObjectNodeAcceptor {
     private Double interestRate;
     private Double minimumBalance;
     private List<Transaction> transactions;
+    private ServicePlan servicePlan;
+    private List<Card> usedOneTimeCards;
     @Builder
     public Account(final String iban,
                    final Double balance,
                    final String currency,
                    final AccountType accountType,
                    final Double interestRate,
-                   final Double minimumBalance) {
+                   final Double minimumBalance,
+                   final String occupation,
+                   final String email) {
+        Bank bank = BankSingleton.getInstance();
         this.iban = iban;
         this.balance = balance;
         this.currency = currency;
@@ -40,6 +48,23 @@ public class Account implements ObjectNodeAcceptor {
         this.minimumBalance = minimumBalance;
         this.cards = new ArrayList<>();
         this.transactions = new ArrayList<>();
+
+        if (occupation.equals(ServicePlan.STUDENT.getName())) {
+            servicePlan = ServicePlan.STUDENT;
+        } else {
+            servicePlan = ServicePlan.STANDARD;
+        }
+
+        User user = bank.getUser(email);
+        if (user != null) {
+            for (Account account : user.getAccounts()) {
+                if (account.getServicePlan().equals(ServicePlan.GOLD)) {
+                    servicePlan = ServicePlan.GOLD;
+                } else if (account.getServicePlan().equals(ServicePlan.SILVER)) {
+                    servicePlan = ServicePlan.SILVER;
+                }
+            }
+        }
     }
 
     /**
@@ -103,7 +128,11 @@ public class Account implements ObjectNodeAcceptor {
      * Adds the interest.
      */
     public final void addInterest() {
-        balance += interestRate * balance;
+        balance += getInterestAmount();
+    }
+
+    public final Double getInterestAmount() {
+        return interestRate * balance;
     }
 
     /**

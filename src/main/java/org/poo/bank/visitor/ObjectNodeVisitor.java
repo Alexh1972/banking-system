@@ -3,7 +3,7 @@ package org.poo.bank.visitor;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.entity.transaction.*;
-import org.poo.bank.entity.User;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 
@@ -100,4 +100,12 @@ public interface ObjectNodeVisitor {
      * @return The array node.
      */
     ArrayNode toArrayNode(List<Transaction> transactionList);
+
+    ObjectNode toObjectNode(WithdrawSavingsTransaction transaction);
+
+    ObjectNode toObjectNode(UpgradePlanTransaction transaction);
+
+    ObjectNode toObjectNode(CashWithdrawalTransaction transaction);
+
+    ObjectNode toObjectNode(AddInterestTransaction transaction);
 }

@@ -2,7 +2,9 @@ package org.poo.bank.action;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
-import org.poo.bank.entity.User;
+import org.poo.bank.BankSingleton;
+import org.poo.bank.entity.Commerciant;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;
@@ -16,6 +18,7 @@ public class CardPaymentAction extends Action {
     @Override
     public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
+            Commerciant commerciant = bank.getCommerciant(commandInput.getCommerciant());
             if (commandInput.getEmail() == null) {
                 throw new RuntimeException("User not found");
             }
@@ -37,7 +40,17 @@ public class CardPaymentAction extends Action {
                     commandInput.getCurrency(),
                     account.getCurrency());
 
-            TransferType transferResult = account.subtractBalance(amountSpent, card);
+            Double noCommissionAmount = amountSpent;
+
+            amountSpent += account.getServicePlan().getCommission(amountSpent, account.getCurrency());
+
+            Double cashbackAmount = noCommissionAmount * commerciant
+                    .getCashbackStrategy()
+                    .getCashbackRate(account, commerciant, noCommissionAmount);
+
+            Double noCashBackAmount = amountSpent;
+            Double finalAmountSpent = amountSpent - cashbackAmount;
+            TransferType transferResult = account.subtractBalance(finalAmountSpent, card);
 
             switch (transferResult) {
                 case TRANSFER_TYPE_INSUFFICIENT_FUNDS -> TransactionNotifier.notify(
@@ -47,8 +60,10 @@ public class CardPaymentAction extends Action {
                 case TRANSFER_TYPE_SUCCESSFUL -> {
                     TransactionNotifier.notify(
                             new CardPaymentTransaction(commandInput.getCommerciant(),
-                                    amountSpent,
-                                    commandInput.getTimestamp()),
+                                    noCommissionAmount,
+                                    noCashBackAmount,
+                                    commandInput.getTimestamp(),
+                                    account),
                             user,
                             account);
 
@@ -61,6 +76,7 @@ public class CardPaymentAction extends Action {
                                 .build();
 
                         bank.deleteCard(card, account);
+                        bank.addUsedCard(card);
                         TransactionNotifier.notify(
                                 new DeleteCardTransaction(
                                         account.getIban(),

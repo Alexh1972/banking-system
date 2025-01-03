@@ -2,7 +2,7 @@ package org.poo.bank.action;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
-import org.poo.bank.entity.User;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;

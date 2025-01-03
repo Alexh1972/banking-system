@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.AccountType;
+import org.poo.bank.entity.transaction.AddInterestTransaction;
+import org.poo.bank.entity.user.User;
+import org.poo.bank.notification.TransactionNotifier;
 import org.poo.fileio.CommandInput;
 
 public class AddInterestAction extends Action {
@@ -20,6 +23,16 @@ public class AddInterestAction extends Action {
                 throw new RuntimeException("This is not a savings account");
             }
 
+            User user = bank.getUser(account);
+            TransactionNotifier.notify(
+                    new AddInterestTransaction(
+                            account.getInterestAmount(),
+                            account.getCurrency(),
+                            commandInput.getTimestamp()
+                    ),
+                    user,
+                    account
+            );
             account.addInterest();
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());

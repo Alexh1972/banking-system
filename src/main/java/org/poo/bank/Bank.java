@@ -3,20 +3,17 @@ package org.poo.bank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.poo.bank.entity.Alias;
-import org.poo.bank.entity.ExchangeRate;
-import org.poo.bank.entity.User;
+import org.poo.bank.entity.*;
+import org.poo.bank.entity.account.Associate;
+import org.poo.bank.entity.account.Associates;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
-import org.poo.fileio.ExchangeInput;
-import org.poo.fileio.ObjectInput;
-import org.poo.fileio.UserInput;
+import org.poo.bank.strategy.cashback.CashbackStrategy;
+import org.poo.fileio.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -32,6 +29,12 @@ public class Bank {
     private Map<String, BigDecimal> exchangeRates;
     private Map<Alias, String> aliasMap;
     private Map<String, String> globalAliasMap;
+    private Map<String, Commerciant> commerciantMap;
+    private List<Commerciant> commerciants;
+    private Map<Account, Associates> associateMap;
+    private Map<String, Card> usedCards;
+    private CashbackRates cashbackRates;
+    private List<SplitPayment> splitPayments;
 
     /**
      * Initialize the bank given input such as exchange rates,
@@ -48,14 +51,33 @@ public class Bank {
         exchangeRates = new HashMap<>();
         aliasMap = new HashMap<>();
         globalAliasMap = new HashMap<>();
+        associateMap = new HashMap<>();
+        commerciants = new ArrayList<>();
+        commerciantMap = new HashMap<>();
+        usedCards = new HashMap<>();
+        cashbackRates = new CashbackRates();
+        splitPayments = new ArrayList<>();
 
         for (UserInput userInput : objectInput.getUsers()) {
             User user = new User(
                     userInput.getFirstName(),
                     userInput.getLastName(),
-                    userInput.getEmail());
+                    userInput.getEmail(),
+                    userInput.getBirthDate(),
+                    userInput.getOccupation());
             users.add(user);
             userEmailMap.put(userInput.getEmail(), user);
+        }
+
+        for (CommerciantInput commerciantInput : objectInput.getCommerciants()) {
+            Commerciant commerciant = new Commerciant(
+                    commerciantInput.getCommerciant(),
+                    commerciantInput.getId(),
+                    commerciantInput.getAccount(),
+                    commerciantInput.getType(),
+                    commerciantInput.getCashbackStrategy());
+            commerciants.add(commerciant);
+            commerciantMap.put(commerciant.getName(), commerciant);
         }
 
         List<ExchangeRate> rates = new ArrayList<>();
@@ -72,6 +94,46 @@ public class Bank {
         }
 
         combineRates(rates);
+    }
+
+    public Commerciant getCommerciant(String commerciant) {
+        return commerciantMap.get(commerciant);
+    }
+
+    public void addAssociate(Account account, String email, String type) {
+        addAssociate(account, getUser(email), type);
+    }
+
+    public void addUsedCard(Card card) {
+        usedCards.put(card.getCardNumber(), card);
+    }
+
+    public void addSplitPayment(SplitPayment payment) {
+        splitPayments.add(payment);
+    }
+
+    public void removeSplitPayment(SplitPayment payment) {
+        splitPayments.remove(payment);
+    }
+
+    public Card getUsedCard(String card) {
+        return usedCards.get(card);
+    }
+
+    public void addAssociate(Account account, User user, String type) {
+        Associates associates = getAssociates(account);
+
+        if (associates == null) {
+            associates = new Associates();
+            associates.getAssociates().add(new Associate(user, type));
+            associateMap.put(account, associates);
+        } else {
+            associates.getAssociates().add(new Associate(user, type));
+        }
+    }
+
+    public Associates getAssociates(Account account) {
+        return associateMap.get(account);
     }
 
     private void combineRates(final List<ExchangeRate> rates) {
@@ -255,8 +317,8 @@ public class Bank {
      */
     public final void deleteAccount(final User user,
                               final Account account) {
-        for (Card card : account.getCards()) {
-            deleteCard(card, account);
+        while (!account.getCards().isEmpty()) {
+            deleteCard(account.getCards().getFirst(), account);
         }
 
         user.getAccounts().remove(account);

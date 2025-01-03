@@ -1,5 +1,8 @@
 package org.poo.utils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 public final class Utils {
@@ -57,5 +60,9 @@ public final class Utils {
     public static void resetRandom() {
         ibanRandom = new Random(IBAN_SEED);
         cardRandom = new Random(CARD_SEED);
+    }
+
+    public static LocalDateTime convertDate(String str) {
+        return LocalDate.parse(str, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
     }
 }
