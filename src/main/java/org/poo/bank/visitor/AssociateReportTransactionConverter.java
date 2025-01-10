@@ -19,10 +19,10 @@ public class AssociateReportTransactionConverter implements AssociateReportConve
     public ObjectNode toObjectNode(Associate associate, Integer start, Integer finish) {
         ObjectNode objectNode = MAPPER.createObjectNode();
 
-        Double spent = BigDecimal.valueOf(associate.getSpent(start, finish)).setScale(2, RoundingMode.HALF_UP).doubleValue();
-        Double deposited = BigDecimal.valueOf(associate.getDeposited(start, finish)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        Double spent = associate.getSpent(start, finish);
+        Double deposited = associate.getDeposited(start, finish);
 
-        objectNode.put("username", associate.getUser().getFirstName() + " " + associate.getUser().getLastName());
+        objectNode.put("username", associate.getUser().getLastName() + " " + associate.getUser().getFirstName());
         objectNode.put("spent", spent);
         objectNode.put("deposited", deposited);
         return objectNode;
@@ -42,10 +42,10 @@ public class AssociateReportTransactionConverter implements AssociateReportConve
         ObjectNode objectNode = MAPPER.createObjectNode();
 
         objectNode.put("IBAN", account.getIban());
-        objectNode.put("balance", BigDecimal.valueOf(account.getBalance()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        objectNode.put("balance", account.getBalance());
         objectNode.put("currency", account.getCurrency());
-        objectNode.put("spending limit", BigDecimal.valueOf(associates.getPaymentLimit()).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        objectNode.put("deposit limit", BigDecimal.valueOf(associates.getDepositLimit()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        objectNode.put("spending limit", associates.getPaymentLimit());
+        objectNode.put("deposit limit", associates.getDepositLimit());
         objectNode.put("statistics type", "transaction");
 
         for (Associate.AssociateType type : Associate.AssociateType.values()) {
@@ -56,12 +56,6 @@ public class AssociateReportTransactionConverter implements AssociateReportConve
                         associateList.add(associate);
                     }
                 }
-
-                associateList = associateList.stream().sorted((o1, o2) -> {
-                    String first = o1.getUser().getFirstName() + " " + o1.getUser().getLastName();
-                    String second = o2.getUser().getFirstName() + " " + o2.getUser().getLastName();
-                    return first.compareTo(second);
-                }).toList();
 
                 objectNode.put(type.getName() + "s", toArrayNode(associateList, start, finish));
             }
@@ -76,8 +70,8 @@ public class AssociateReportTransactionConverter implements AssociateReportConve
             }
         }
 
-        objectNode.put("total spent", BigDecimal.valueOf(spent).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        objectNode.put("total deposited", BigDecimal.valueOf(deposited).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        objectNode.put("total spent", spent);
+        objectNode.put("total deposited", deposited);
         return objectNode;
     }
 }

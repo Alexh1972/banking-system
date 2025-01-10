@@ -30,7 +30,8 @@ public enum TransactionMessage {
     TRANSACTION_MESSAGE_WITHDRAW_SAVINGS("Savings withdrawal"),
     TRANSACTION_MESSAGE_UPGRADE_PLAN("Upgrade plan"),
     TRANSACTION_MESSAGE_CASH_WITHDRAW("Cash withdrawal of {amount}"),
-    TRANSACTION_MESSAGE_ADD_INTEREST("Interest rate income");
+    TRANSACTION_MESSAGE_ADD_INTEREST("Interest rate income"),
+    TRANSACTION_MESSAGE_REJECTED_SPLIT_PAYMENT("One user rejected the payment.");
 
     private final String value;
     TransactionMessage(final String value) {

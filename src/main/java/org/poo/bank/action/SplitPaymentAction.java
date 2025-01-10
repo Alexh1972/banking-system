@@ -17,59 +17,6 @@ import java.util.List;
 public class SplitPaymentAction extends Action {
     @Override
     public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
-//        TransactionNotifier notifier = new TransactionNotifier();
-//        List<String> accounts = commandInput.getAccounts();
-//        List<Account> accountsList = new ArrayList<>();
-//        boolean isPaymentValid = true;
-//        String errorIBAN = null;
-//        int numberPayers = accounts.size();
-//
-//        for (String accountIBAN : accounts) {
-//            Account account = bank.getAccount(accountIBAN);
-//            Double amount = bank.getAmount(
-//                    commandInput.getAmount(),
-//                    commandInput.getCurrency(),
-//                    account.getCurrency()) / numberPayers;
-//
-//            if (!account.canPay(amount)) {
-//                isPaymentValid = false;
-//                errorIBAN = accountIBAN;
-//            }
-//
-//            accountsList.add(account);
-//            notifier.addListener(bank.getUser(account), account);
-//        }
-//
-//        if (isPaymentValid) {
-//            for (Account account : accountsList) {
-//                Double amount = bank.getAmount(
-//                        commandInput.getAmount(),
-//                        commandInput.getCurrency(),
-//                        account.getCurrency()) / numberPayers;
-//
-//                account.subtractBalance(amount);
-//            }
-//
-//            Transaction transaction =
-//                    new SplitPaymentTransaction(
-//                    commandInput.getAmount(),
-//                    commandInput.getCurrency(),
-//                    numberPayers,
-//                    accounts,
-//                    commandInput.getTimestamp());
-//            notifier.notifyUsers(transaction);
-//        } else {
-//            Transaction transaction =
-//                    new SplitPaymentErrorTransaction(
-//                    commandInput.getAmount(),
-//                    commandInput.getCurrency(),
-//                    numberPayers,
-//                    accounts,
-//                    errorIBAN,
-//                    commandInput.getTimestamp());
-//            notifier.notifyUsers(transaction);
-//        }
-//
         SplitPaymentType paymentType = SplitPaymentType.getSplitPaymentType(commandInput.getSplitPaymentType());
         List<Double> amounts = commandInput.getAmountForUsers();
 

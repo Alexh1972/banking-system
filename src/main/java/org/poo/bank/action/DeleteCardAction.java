@@ -33,7 +33,7 @@ public class DeleteCardAction extends Action {
             User user = bank.getUser(account);
 
             if (user == null || !user.equals(bank.getUser(commandInput.getEmail()))) {
-                throw new RuntimeException("User not found");
+                return null;
             }
 
             Associates associates = bank.getAssociates(account);
@@ -41,6 +41,10 @@ public class DeleteCardAction extends Action {
                 if (!associates.getAssociate(user).getType().getCanDeleteAnyCard() && !card.getOwnerEmail().equals(user.getEmail())) {
                     throw new RuntimeException("You are not authorized to make this transaction.");
                 }
+            }
+
+            if (account.getBalance() > 0.0) {
+                return null;
             }
 
             bank.deleteCard(card, account);

@@ -13,6 +13,8 @@ import org.poo.bank.entity.user.User;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Data
@@ -28,6 +30,7 @@ public class Account implements ObjectNodeAcceptor {
     private List<Transaction> transactions;
     private ServicePlan servicePlan;
     private List<Card> usedOneTimeCards;
+    private Integer highSumPayments = 0;
     @Builder
     public Account(final String iban,
                    final Double balance,
@@ -72,6 +75,25 @@ public class Account implements ObjectNodeAcceptor {
      */
     public final boolean canPay(final Double amount) {
         return amount <= balance;
+    }
+
+    public final boolean canUpgradePlan(final Double amount) {
+        if (!servicePlan.equals(ServicePlan.SILVER)) {
+            return false;
+        }
+
+        if (highSumPayments == 5) {
+            return true;
+        }
+        Bank bank = BankSingleton.getInstance();
+        Double amountConverted = bank.getAmount(amount, getCurrency(), "RON");
+
+        if (amountConverted >= 300.0) {
+            highSumPayments++;
+            return highSumPayments == 5;
+        }
+
+        return false;
     }
 
     /**

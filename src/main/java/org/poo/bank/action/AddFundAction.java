@@ -23,9 +23,9 @@ public class AddFundAction extends Action {
 
             if (bank.isAssociate(account, user)) {
                 Associates associates = bank.getAssociates(account);
-
                 if (!associates.canAddFunds(user, commandInput.getAmount())) {
-                    throw new RuntimeException("You are not authorized to make this transaction.");
+//                    throw new RuntimeException("You are not authorized to make this transaction.");
+                    return null;
                 }
 
                 associates.updateAssociateDeposit(user, commandInput.getAmount(), commandInput.getTimestamp());

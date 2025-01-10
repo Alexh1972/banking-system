@@ -58,7 +58,7 @@ public class WithdrawSavingsAction extends Action {
                     classicAccount.getCurrency(),
                     account.getCurrency());
 
-            amountSent += account.getServicePlan().getCommission(amountSent, account.getCurrency());
+//            amountSent += account.getServicePlan().getCommission(amountSent, account.getCurrency());
 
             if (account.subtractBalance(amountSent)) {
                 classicAccount.addBalance(amountReceived);
@@ -69,6 +69,13 @@ public class WithdrawSavingsAction extends Action {
                                 commandInput.getTimestamp()),
                         user,
                         account);
+                TransactionNotifier.notify(new WithdrawSavingsTransaction(
+                                classicAccount.getIban(),
+                                account.getIban(),
+                                commandInput.getAmount(),
+                                commandInput.getTimestamp()),
+                        user,
+                        classicAccount);
             } else {
                 TransactionNotifier.notify(new BaseTransaction(TransactionMessage.TRANSACTION_MESSAGE_INSUFFICIENT_FUNDS.getValue(),
                                 commandInput.getTimestamp()),

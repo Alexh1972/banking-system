@@ -7,16 +7,19 @@ import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.user.User;
 import org.poo.fileio.CommandInput;
 
-public class ChangeSpendingLimitAssociate extends Action {
+public class ChangeSpendingLimitAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
         try {
             Account account = bank.getAccount(commandInput.getAccount());
-            User user = bank.getUser(account);
+            User user = bank.getUser(commandInput.getEmail());
             Associates associates = bank.getAssociates(account);
 
-            if (associates.changePaymentLimit(user, commandInput.getAmount())) {
-
+            if (associates == null) {
+                throw new RuntimeException("This is not a business account");
+            }
+            if (!associates.changePaymentLimit(user, commandInput.getAmount())) {
+                throw new RuntimeException("You must be owner in order to change spending limit.");
             }
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());

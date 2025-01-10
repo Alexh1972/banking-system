@@ -35,7 +35,17 @@ public class Associates {
     public void addAssociate(User user, Associate.AssociateType type) {
         Associate associate = new Associate(user, type);
         associates.add(associate);
-        associateMap.put(user, associate);
+
+        if (associateMap.containsKey(user)) {
+            Associate oldAssociate = associateMap.get(user);
+
+            if (Associate.AssociateType.isUpgrade(type, oldAssociate.getType())) {
+                associateMap.put(user, associate);
+            }
+//            oldAssociate.setType(type);
+        } else {
+            associateMap.put(user, associate);
+        }
     }
 
     public void addAssociate(User user, String type) {
@@ -52,7 +62,12 @@ public class Associates {
     }
 
     public boolean changePaymentLimit(User user, Double amount) {
-        if (getAssociate(user).getType().getCanChangeLimits()) {
+        Associate associate = getAssociate(user);
+        if (associate == null) {
+            return true;
+        }
+
+        if (associate.getType().getCanChangeLimits()) {
             paymentLimit = amount;
             return true;
         }
@@ -65,11 +80,10 @@ public class Associates {
     }
 
     public boolean canPay(User user, Double amount, String currency) {
-        Bank bank = BankSingleton.getInstance();
         Associate associate = getAssociate(user);
         Associate.AssociateType associateType = associate.getType();
 
-        return !associateType.getHasPaymentLimit() || bank.getAmount(amount, currency, getDefaultCurrency()) <= paymentLimit;
+        return !associateType.getHasPaymentLimit() ||  amount <= paymentLimit;
     }
 
     public void updateAssociatePayment(User user, Double amount, Integer timestamp) {

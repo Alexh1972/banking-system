@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.*;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.AccountType;
+import org.poo.bank.entity.account.ServicePlan;
 import org.poo.bank.entity.transaction.Transaction;
 import org.poo.bank.notification.TransactionListener;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
@@ -65,6 +66,12 @@ public class User implements ObjectNodeAcceptor, TransactionListener {
                 LocalDate.of(birthDate.getYear(), birthDate.getMonth() , birthDate.getDayOfMonth()),
                 LocalDate.of(2024 , 1 , 1)
         );
+    }
+
+    public void setPlan(ServicePlan servicePlan) {
+        for (Account account : getAccounts()) {
+            account.setServicePlan(servicePlan);
+        }
     }
 
     /**

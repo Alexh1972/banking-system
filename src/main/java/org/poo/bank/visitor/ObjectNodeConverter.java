@@ -71,7 +71,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         ObjectNode objectNode = MAPPER.createObjectNode();
 
         objectNode.put("IBAN", account.getIban());
-        objectNode.put("balance", BigDecimal.valueOf(account.getBalance()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        objectNode.put("balance", account.getBalance());
         objectNode.put("currency", account.getCurrency());
         objectNode.put("type", account.getAccountType().getValue());
 
@@ -206,12 +206,16 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
 
         objectNode.put("involvedAccounts", arrayNode);
 
-        ArrayNode amountNode = MAPPER.createArrayNode();
-        for (Double account : transaction.getAmounts()) {
-            amountNode.add(account);
-        }
+        if (transaction.getType().equals("custom")) {
+            ArrayNode amountNode = MAPPER.createArrayNode();
+            for (Double account : transaction.getAmounts()) {
+                amountNode.add(account);
+            }
 
-        objectNode.put("amountForUsers", amountNode);
+            objectNode.put("amountForUsers", amountNode);
+        } else {
+            objectNode.put("amount",  transaction.getAmount() / transaction.getNumberPayers());
+        }
         return objectNode;
     }
 

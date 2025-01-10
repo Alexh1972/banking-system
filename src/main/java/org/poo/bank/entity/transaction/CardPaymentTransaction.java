@@ -11,8 +11,7 @@ import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 @Getter
 @Setter
-public class CardPaymentTransaction extends Transaction implements ObjectNodeAcceptor {
-    private String commerciant;
+public class CardPaymentTransaction extends CommerciantTransaction implements ObjectNodeAcceptor {
     private Double amount;
     private String currency;
     private Double amountNoCashback;
@@ -21,8 +20,7 @@ public class CardPaymentTransaction extends Transaction implements ObjectNodeAcc
                                   final Double amountNoCashback,
                                   final Integer timestamp,
                                   final Account account) {
-        super(TransactionMessage.TRANSACTION_MESSAGE_CARD_PAYMENT.getValue(), timestamp);
-        this.commerciant = commerciantName;
+        super(TransactionMessage.TRANSACTION_MESSAGE_CARD_PAYMENT.getValue(), timestamp, commerciantName, true, amount, account.getCurrency());
         this.amount = amount;
         this.amountNoCashback = amountNoCashback;
         this.currency = account.getCurrency();

@@ -24,10 +24,10 @@ public class AssociateReportCommerciantConverter implements AssociateReportConve
         ObjectNode objectNode = MAPPER.createObjectNode();
 
         objectNode.put("IBAN", account.getIban());
-        objectNode.put("balance", BigDecimal.valueOf(account.getBalance()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        objectNode.put("balance", account.getBalance());
         objectNode.put("currency", account.getCurrency());
-        objectNode.put("spending limit", BigDecimal.valueOf(associates.getPaymentLimit()).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        objectNode.put("deposit limit", BigDecimal.valueOf(associates.getDepositLimit()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        objectNode.put("spending limit", associates.getPaymentLimit());
+        objectNode.put("deposit limit", associates.getDepositLimit());
         objectNode.put("statistics type", "commerciant");
 
         ArrayNode arrayNode = MAPPER.createArrayNode();
@@ -61,24 +61,25 @@ public class AssociateReportCommerciantConverter implements AssociateReportConve
             }
 
             associateList = associateList.stream().sorted((o1, o2) -> {
-                String first = o1.getUser().getFirstName() + " " + o1.getUser().getLastName();
-                String second = o2.getUser().getFirstName() + " " + o2.getUser().getLastName();
+                String first = o1.getUser().getLastName() + " " + o1.getUser().getFirstName();
+                String second = o2.getUser().getLastName() + " " + o2.getUser().getFirstName();
                 return first.compareTo(second);
             }).toList();
 
-            objectNode.put(type.getName() + "s", toArrayNode(associateList, start, finish));
+            objectNode.put(type.getName() + "s", toArrayNode(associateList));
         }
 
-        objectNode.put("totalReceived", total);
+        objectNode.put("total received", total);
+        objectNode.put("commerciant", commerciant.getName());
 
         return objectNode;
     }
 
 
-    public ArrayNode toArrayNode(List<Associate> associates, Integer start, Integer finish) {
+    public ArrayNode toArrayNode(List<Associate> associates) {
         ArrayNode arrayNode = MAPPER.createArrayNode();
         for (Associate associate : associates) {
-            arrayNode.add(associate.getUser().getFirstName() + " " + associate.getUser().getLastName());
+            arrayNode.add(associate.getUser().getLastName() + " " + associate.getUser().getFirstName());
         }
         return arrayNode;
     }

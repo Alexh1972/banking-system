@@ -20,12 +20,11 @@ public class SplitPaymentErrorTransaction
                                         final String errorIBAN,
                                         final Integer timestamp,
                                         final String type,
-                                        final List<Double> amounts) {
+                                        final List<Double> amounts,
+                                        final String error) {
         super(amount, currency, numberPayers, involvedAccounts, timestamp, type, amounts);
 
-        this.error = TransactionMessage.TRANSACTION_MESSAGE_SPLIT_PAYMENT_ERROR
-                .getValue()
-                .replace("{IBAN}", errorIBAN);
+        this.error = error;
     }
 
     /**

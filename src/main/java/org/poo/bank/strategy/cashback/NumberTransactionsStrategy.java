@@ -25,22 +25,26 @@ public class NumberTransactionsStrategy extends CashbackStrategy {
     @Override
     public void updateCashback(Account account, Commerciant commerciant) {
         Bank bank = BankSingleton.getInstance();
+        bank.getCashbackRates().deleteCashbackRate(account, CashbackType.getCashbackType(commerciant.getType().getValue()));
         List<Transaction> transactions = getTransactions(account, commerciant);
-        CashbackType cashbackType = CashbackType.getCashbackType(commerciant.getType().getValue());
+        CashbackType cashbackType = null;
 
         List<Double> rates = bank.getCashbackRates().getCashbackRates(account, cashbackType, commerciant);
 
+        int size = transactions.size() + 1;
         double rate = 0.0;
-        if (transactions.size() >= 10) {
+        if (size >= 10) {
             rate = 10.0 / 100;
-        } else if (transactions.size() >= 5) {
+            cashbackType = CashbackType.FOR_TECH;
+        } else if (size >= 5) {
             rate = 5.0 / 100;
-        } else if (transactions.size() >= 2) {
+            cashbackType = CashbackType.FOR_CLOTHES;
+        } else if (size >= 2) {
             rate = 2.0 / 100;
+            cashbackType = CashbackType.FOR_FOOD;
         }
-
         if (rate != 0.0) {
-            if (rates == null || rates.contains(rate)) {
+            if (rates == null || !rates.contains(rate)) {
                 bank.getCashbackRates().addCashbackRate(account, rate, cashbackType, commerciant);
             }
         }

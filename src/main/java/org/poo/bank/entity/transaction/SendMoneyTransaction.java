@@ -5,9 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @Setter
 @Getter
-public class SendMoneyTransaction extends Transaction {
+public class SendMoneyTransaction extends CommerciantTransaction {
     private String amount;
     private String receiverIBAN;
     private String senderIBAN;
@@ -20,8 +23,24 @@ public class SendMoneyTransaction extends Transaction {
                                 final String receiverIBAN,
                                 final String senderIBAN,
                                 final TransferType transferType) {
-        super(description, timestamp);
-        this.amount = amount + " " + currency;
+        super(description, timestamp, amount, currency);
+        this.amount = amount.toString() + " " + currency;
+        this.receiverIBAN = receiverIBAN;
+        this.senderIBAN = senderIBAN;
+        this.transferType = transferType;
+    }
+
+    public SendMoneyTransaction(final String description,
+                                final Integer timestamp,
+                                final Double amount,
+                                final String currency,
+                                final String receiverIBAN,
+                                final String senderIBAN,
+                                final TransferType transferType,
+                                final String commerciantName,
+                                final boolean forCommerciant) {
+        super(description, timestamp, commerciantName, forCommerciant, amount, currency);
+        this.amount = amount.toString() + " " + currency;
         this.receiverIBAN = receiverIBAN;
         this.senderIBAN = senderIBAN;
         this.transferType = transferType;

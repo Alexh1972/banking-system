@@ -78,7 +78,7 @@ public class GetSpendingsReportAction extends Action {
             ObjectNode accountNode = getMapper().createObjectNode();
             accountNode.put("transactions", OBJECT_NODE_CONVERTER.toArrayNode(transactions));
             accountNode.put("IBAN", account.getIban());
-            accountNode.put("balance", BigDecimal.valueOf(account.getBalance()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            accountNode.put("balance", account.getBalance());
             accountNode.put("commerciants", arrayNode);
             accountNode.put("currency", account.getCurrency());
 

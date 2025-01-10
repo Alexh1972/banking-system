@@ -3,6 +3,7 @@ package org.poo.bank.action;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
 import org.poo.bank.entity.account.Account;
+import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.transaction.BaseTransaction;
 import org.poo.bank.entity.transaction.CashWithdrawalTransaction;
@@ -16,7 +17,7 @@ public class CashWithdrawalAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
         try {
-            if (commandInput.getEmail() == null) {
+            if (commandInput.getEmail() == null || commandInput.getEmail().isEmpty()) {
                 throw new RuntimeException("User not found");
             }
 
@@ -28,6 +29,12 @@ public class CashWithdrawalAction extends Action {
 
             Account account = bank.getAccount(card);
             User user = bank.getUser(account);
+            Associates associates = bank.getAssociates(account);
+            if (associates == null) {
+                if (!bank.getUser(card).getEmail().equals(commandInput.getEmail())) {
+                    throw new RuntimeException("Card not found");
+                }
+            }
 
             Double amount = bank.getAmount(commandInput.getAmount(), "RON", account.getCurrency());
             Double commissionAmount = amount + account.getServicePlan().getCommission(amount, account.getCurrency());

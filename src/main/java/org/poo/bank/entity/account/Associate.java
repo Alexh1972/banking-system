@@ -142,5 +142,17 @@ public class Associate {
 
             return EMPLOYEE;
         }
+
+        public static boolean isUpgrade(AssociateType type1, AssociateType type2) {
+            if (type1.equals(OWNER)) {
+                return type2.equals(MANAGER) || type2.equals(EMPLOYEE);
+            } else if (type1.equals(MANAGER)) {
+                return type2.equals(EMPLOYEE);
+            } else if (type1.equals(EMPLOYEE)) {
+                return false;
+            }
+
+            return false;
+        }
     }
 }

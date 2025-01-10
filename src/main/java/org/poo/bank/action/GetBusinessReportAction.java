@@ -20,7 +20,9 @@ public class GetBusinessReportAction extends Action {
 
         Account account = bank.getAccount(commandInput.getAccount());
         Associates associates = bank.getAssociates(account);
-
-        return objectNodeConverter.toObjectNode(associates, commandInput.getStartTimestamp(), commandInput.getEndTimestamp());
+        ObjectNode objectNode = getMapper().createObjectNode();
+        objectNode.put("output",
+                objectNodeConverter.toObjectNode(associates, commandInput.getStartTimestamp(), commandInput.getEndTimestamp()));
+        return objectNode;
     }
 }

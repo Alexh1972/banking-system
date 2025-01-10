@@ -25,11 +25,16 @@ public class UpgradePlanAction extends Action {
 
             ServicePlan newServicePlan = ServicePlan.getServicePlan(commandInput.getNewPlanType());
             if (account.getServicePlan().equals(newServicePlan)) {
-                throw new RuntimeException("The user already has the " + account.getServicePlan().getName() + " plan.");
+                TransactionNotifier.notify(new BaseTransaction("The user already has the " + account.getServicePlan().getName() + " plan.", commandInput.getTimestamp()),
+                        user,
+                        account
+                );
+                return null;
             }
 
             if (!ServicePlan.isUpgrade(account.getServicePlan(), newServicePlan)) {
-                throw new RuntimeException("You cannot downgrade your plan.");
+//                throw new RuntimeException("You cannot downgrade your plan.");
+                return null;
             }
 
             Double amount = bank.getAmount(
@@ -40,9 +45,7 @@ public class UpgradePlanAction extends Action {
                     account.getCurrency());
 
             if (account.subtractBalance(amount)) {
-                for (Account userAccount : user.getAccounts()) {
-                    userAccount.setServicePlan(newServicePlan);
-                }
+                user.setPlan(newServicePlan);
                 TransactionNotifier.notify(new UpgradePlanTransaction(
                                 newServicePlan.getName(),
                                 account.getIban(),

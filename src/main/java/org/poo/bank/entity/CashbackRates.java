@@ -2,16 +2,15 @@ package org.poo.bank.entity;
 
 import org.poo.bank.entity.account.Account;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CashbackRates {
     private Map<Account, Map<CashbackType, Map<Commerciant, List<Double>>>> cashbackMap;
+    private Map<Account, Set<CashbackType>> usedCashbacksMap;
 
     public CashbackRates() {
         cashbackMap = new HashMap<>();
+        usedCashbacksMap = new HashMap<>();
     }
 
     public Map<Commerciant, List<Double>> getCashbackRates(Account account, CashbackType type) {
@@ -53,13 +52,8 @@ public class CashbackRates {
                 continue;
             }
 
-//            for (Double rateValue : rateValues) {
-//                rate += rateValue;
-//            }
-
-            while (!rateValues.isEmpty()) {
-                rate += rateValues.getFirst();
-                rateValues.removeFirst();
+            for (Double rateValue : rateValues) {
+                rate += rateValue;
             }
         }
 
@@ -68,6 +62,36 @@ public class CashbackRates {
         }
 
         return rate;
+    }
+
+    public void deleteCashbackRate(Account account, CashbackType type) {
+        Map<Commerciant, List<Double>> rates = getCashbackRates(account, type);
+
+        if (rates == null) {
+            return;
+        }
+
+        for (Commerciant commerciant : rates.keySet()) {
+            List<Double> rateValues = rates.get(commerciant);
+
+            if (rateValues == null) {
+                continue;
+            }
+
+            while (!rateValues.isEmpty()) {
+                rateValues.removeFirst();
+            }
+        }
+    }
+
+    public boolean wasCashbackUsed(Account account, CashbackType cashbackType) {
+        Set<CashbackType> set = usedCashbacksMap.get(account);
+
+        if (set == null) {
+            return false;
+        }
+
+        return set.contains(cashbackType);
     }
 
     public void addCashbackRate(Account account, Double rate, CashbackType type, Commerciant commerciant) {
@@ -92,6 +116,16 @@ public class CashbackRates {
             commerciantRates.put(commerciant, rateValues);
         }
 
-        rateValues.add(rate);
+        if (!wasCashbackUsed(account, type)) {
+            rateValues.add(rate);
+
+            Set<CashbackType> set = usedCashbacksMap.get(account);
+            if (set == null) {
+                set = new HashSet<>();
+                usedCashbacksMap.put(account, set);
+            }
+
+            set.add(type);
+        }
     }
 }

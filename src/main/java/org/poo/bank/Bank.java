@@ -22,6 +22,7 @@ public class Bank {
     private static final String DELIMITER = "$";
     private List<User> users;
     private Map<String, Account> accountIBANMap;
+    private Map<String, Commerciant> commerciantIbanMap;
     private Map<String, User> userEmailMap;
     private Map<Account, User> userAccountMap;
     private Map<String, Card> cardNumberMap;
@@ -57,6 +58,7 @@ public class Bank {
         usedCards = new HashMap<>();
         cashbackRates = new CashbackRates();
         splitPayments = new ArrayList<>();
+        commerciantIbanMap = new HashMap<>();
 
         for (UserInput userInput : objectInput.getUsers()) {
             User user = new User(
@@ -66,7 +68,9 @@ public class Bank {
                     userInput.getBirthDate(),
                     userInput.getOccupation());
             users.add(user);
-            userEmailMap.put(userInput.getEmail(), user);
+            if (!userEmailMap.containsKey(userInput.getEmail())) {
+                userEmailMap.put(userInput.getEmail(), user);
+            }
         }
 
         for (CommerciantInput commerciantInput : objectInput.getCommerciants()) {
@@ -78,6 +82,7 @@ public class Bank {
                     commerciantInput.getCashbackStrategy());
             commerciants.add(commerciant);
             commerciantMap.put(commerciant.getName(), commerciant);
+            commerciantIbanMap.put(commerciant.getAccountIban(), commerciant);
         }
 
         List<ExchangeRate> rates = new ArrayList<>();
@@ -104,6 +109,10 @@ public class Bank {
         addAssociate(account, getUser(email), type);
     }
 
+    public Commerciant getCommerciantByIban(String iban) {
+        return commerciantIbanMap.get(iban);
+    }
+
     public void addUsedCard(Card card) {
         usedCards.put(card.getCardNumber(), card);
     }
@@ -116,9 +125,9 @@ public class Bank {
         splitPayments.remove(payment);
     }
 
-    public SplitPayment getSplitPayment(User user) {
+    public SplitPayment getSplitPayment(User user, String type) {
         for (SplitPayment splitPayment : splitPayments) {
-            if (splitPayment.getAccount(user) != null) {
+            if (splitPayment.getAccount(user) != null && splitPayment.getType().equals(type)) {
                 return splitPayment;
             }
         }
@@ -159,7 +168,8 @@ public class Bank {
             return false;
         }
 
-        return associates.getAssociate(user) != null;
+        Associate associate = associates.getAssociate(user);
+        return  associate != null;
     }
 
     public Associates getAssociates(Account account) {
@@ -338,6 +348,10 @@ public class Bank {
      */
     public final User getUser(final Account account) {
         return userAccountMap.get(account);
+    }
+
+    public final User getUser(final Card card) {
+        return getUser(getAccount(card));
     }
 
     /**

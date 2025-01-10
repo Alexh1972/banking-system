@@ -6,6 +6,7 @@ import org.poo.bank.BankSingleton;
 import org.poo.bank.entity.Commerciant;
 import org.poo.bank.entity.account.Associate;
 import org.poo.bank.entity.account.Associates;
+import org.poo.bank.entity.account.ServicePlan;
 import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
@@ -45,7 +46,6 @@ public class CardPaymentAction extends Action {
             Double noCommissionAmount = amountSpent;
 
             amountSpent += account.getServicePlan().getCommission(amountSpent, account.getCurrency());
-
             Double cashbackAmount = noCommissionAmount * commerciant
                     .getCashbackStrategy()
                     .getCashbackRate(account, commerciant, noCommissionAmount);
@@ -56,14 +56,19 @@ public class CardPaymentAction extends Action {
             Associates associates = bank.getAssociates(account);
             TransferType transferResult;
             if (associates == null) {
+                if (!bank.getUser(card).getEmail().equals(commandInput.getEmail())) {
+                    throw new RuntimeException("Card not found");
+                }
                 transferResult = account.subtractBalance(finalAmountSpent, card);
-            } else {
+            } else if (bank.isAssociate(account, user)) {
                 if (associates.canPay(user, finalAmountSpent, account.getCurrency())) {
                     transferResult = account.subtractBalance(finalAmountSpent, card);
-                    associates.updateAssociatePayment(user, noCommissionAmount, commandInput.getTimestamp());
+                    associates.updateAssociatePayment(user, noCommissionAmount, commerciant, commandInput.getTimestamp());
                 } else {
                     transferResult = TransferType.TRANSFER_TYPE_INSUFFICIENT_FUNDS;
                 }
+            } else {
+                throw new RuntimeException("Card not found");
             }
 
             switch (transferResult) {
@@ -72,15 +77,16 @@ public class CardPaymentAction extends Action {
                         user,
                         account);
                 case TRANSFER_TYPE_SUCCESSFUL -> {
-                    TransactionNotifier.notify(
-                            new CardPaymentTransaction(commandInput.getCommerciant(),
-                                    noCommissionAmount,
-                                    noCashBackAmount,
-                                    commandInput.getTimestamp(),
-                                    account),
-                            user,
-                            account);
-
+                    if (noCommissionAmount != 0) {
+                        TransactionNotifier.notify(
+                                new CardPaymentTransaction(commandInput.getCommerciant(),
+                                        noCommissionAmount,
+                                        noCashBackAmount,
+                                        commandInput.getTimestamp(),
+                                        account),
+                                user,
+                                account);
+                    }
                     if (card.getType().equals(CardType.CARD_TYPE_ONE_TIME)) {
                         Card newCard = Card.builder()
                                 .cardNumber(Utils.generateCardNumber())
@@ -105,6 +111,16 @@ public class CardPaymentAction extends Action {
                                         account.getIban(),
                                         newCard.getCardNumber(),
                                         user.getEmail(),
+                                        commandInput.getTimestamp()),
+                                user,
+                                account);
+                    }
+
+                    if (account.canUpgradePlan(amountSpent)) {
+                        account.setServicePlan(ServicePlan.GOLD);
+                        TransactionNotifier.notify(new UpgradePlanTransaction(
+                                        ServicePlan.GOLD.getName(),
+                                        account.getIban(),
                                         commandInput.getTimestamp()),
                                 user,
                                 account);
