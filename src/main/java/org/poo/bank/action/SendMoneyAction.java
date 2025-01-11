@@ -22,7 +22,6 @@ public class SendMoneyAction extends Action {
 
             Account receiver = bank.getAlias(commandInput.getReceiver());
             User receiverUser = bank.getUser(receiver);
-
             if (sender == null || receiver == null) {
                 if (sender != null) {
                     Commerciant commerciant = bank.getCommerciantByIban(commandInput.getReceiver());

@@ -55,16 +55,13 @@ public final class Main {
                 sorted(Comparator.comparingInt(Main::fileConsumer))
                 .toList();
 
-        int  i = 1;
         for (File file : sortedFiles) {
             String filepath = CheckerConstants.OUT_PATH + file.getName();
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-                if (i == 9)
-                    action(file.getName(), filepath);
+                action(file.getName(), filepath);
             }
-            i++;
         }
 
         Checker.calculateScore();

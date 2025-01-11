@@ -21,9 +21,6 @@ public class AcceptSplitPaymentAction extends Action {
     @Override
     public ObjectNode execute(Bank bank, CommandInput commandInput) {
         try {
-            if (commandInput.getTimestamp() == 271) {
-                int a = 1;
-            }
             if (commandInput.getEmail() == null) {
                 throw new RuntimeException("User not found");
             }

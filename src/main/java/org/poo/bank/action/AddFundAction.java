@@ -3,6 +3,7 @@ package org.poo.bank.action;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
 import org.poo.bank.entity.account.Account;
+import org.poo.bank.entity.account.AccountType;
 import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;
@@ -29,6 +30,8 @@ public class AddFundAction extends Action {
                 }
 
                 associates.updateAssociateDeposit(user, commandInput.getAmount(), commandInput.getTimestamp());
+            } else if (account.getAccountType().equals(AccountType.ACCOUNT_TYPE_BUSINESS)) {
+                return null;
             }
             account.addBalance(commandInput.getAmount());
 

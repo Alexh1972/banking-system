@@ -33,8 +33,7 @@ public class AddAccountAction extends Action {
                     .balance(0.0)
                     .minimumBalance(0.0)
                     .interestRate(commandInput.getInterestRate())
-                    .occupation(user.getOccupation())
-                    .email(commandInput.getEmail())
+                    .servicePlan(user.getServicePlan())
                     .build();
 
             if (account.getAccountType().equals(AccountType.ACCOUNT_TYPE_BUSINESS)) {

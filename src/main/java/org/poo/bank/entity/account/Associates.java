@@ -34,16 +34,9 @@ public class Associates {
 
     public void addAssociate(User user, Associate.AssociateType type) {
         Associate associate = new Associate(user, type);
-        associates.add(associate);
 
-        if (associateMap.containsKey(user)) {
-            Associate oldAssociate = associateMap.get(user);
-
-            if (Associate.AssociateType.isUpgrade(type, oldAssociate.getType())) {
-                associateMap.put(user, associate);
-            }
-//            oldAssociate.setType(type);
-        } else {
+        if (!associateMap.containsKey(user)) {
+            associates.add(associate);
             associateMap.put(user, associate);
         }
     }
@@ -123,8 +116,8 @@ public class Associates {
 
     public boolean canAddFunds(User user, Double amount) {
         Associate.AssociateType associateType = getAssociate(user).getType();
-
-        return associateType.getCanAddFunds() || amount <= depositLimit;
+        boolean answer = associateType.getCanAddFunds() || amount <= depositLimit;
+        return answer;
     }
 
     public String getDefaultCurrency() {

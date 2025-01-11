@@ -38,9 +38,7 @@ public class Account implements ObjectNodeAcceptor {
                    final AccountType accountType,
                    final Double interestRate,
                    final Double minimumBalance,
-                   final String occupation,
-                   final String email) {
-        Bank bank = BankSingleton.getInstance();
+                   final ServicePlan servicePlan) {
         this.iban = iban;
         this.balance = balance;
         this.currency = currency;
@@ -50,22 +48,7 @@ public class Account implements ObjectNodeAcceptor {
         this.cards = new ArrayList<>();
         this.transactions = new ArrayList<>();
 
-        if (occupation.equals(ServicePlan.STUDENT.getName())) {
-            servicePlan = ServicePlan.STUDENT;
-        } else {
-            servicePlan = ServicePlan.STANDARD;
-        }
-
-        User user = bank.getUser(email);
-        if (user != null) {
-            for (Account account : user.getAccounts()) {
-                if (account.getServicePlan().equals(ServicePlan.GOLD)) {
-                    servicePlan = ServicePlan.GOLD;
-                } else if (account.getServicePlan().equals(ServicePlan.SILVER)) {
-                    servicePlan = ServicePlan.SILVER;
-                }
-            }
-        }
+        this.servicePlan = servicePlan;
     }
 
     /**
@@ -117,8 +100,6 @@ public class Account implements ObjectNodeAcceptor {
             if (subtractBalance(subtraction)) {
                 if (balance <= minimumBalance) {
                     card.setStatus(CardStatus.CARD_STATUS_FROZEN);
-                } else if (balance - minimumBalance <= WARNING_BALANCE_THRESHOLD) {
-                    card.setStatus(CardStatus.CARD_STATUS_WARNING);
                 }
 
                 return TransferType.TRANSFER_TYPE_SUCCESSFUL;

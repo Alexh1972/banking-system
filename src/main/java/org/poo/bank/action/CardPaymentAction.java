@@ -63,7 +63,9 @@ public class CardPaymentAction extends Action {
             } else if (bank.isAssociate(account, user)) {
                 if (associates.canPay(user, finalAmountSpent, account.getCurrency())) {
                     transferResult = account.subtractBalance(finalAmountSpent, card);
-                    associates.updateAssociatePayment(user, noCommissionAmount, commerciant, commandInput.getTimestamp());
+                    if (transferResult.equals(TransferType.TRANSFER_TYPE_SUCCESSFUL)) {
+                        associates.updateAssociatePayment(user, noCommissionAmount, commerciant, commandInput.getTimestamp());
+                    }
                 } else {
                     transferResult = TransferType.TRANSFER_TYPE_INSUFFICIENT_FUNDS;
                 }

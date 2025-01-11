@@ -26,6 +26,7 @@ public class User implements ObjectNodeAcceptor, TransactionListener {
     private List<Transaction> transactions;
     private LocalDateTime birthDate;
     private String occupation;
+    private ServicePlan servicePlan;
 
     public User(final String firstName,
                 final String lastName,
@@ -49,6 +50,12 @@ public class User implements ObjectNodeAcceptor, TransactionListener {
         transactions = new ArrayList<>();
         this.birthDate = Utils.convertDate(birthDate);
         this.occupation = occupation;
+
+        if (occupation.equals(ServicePlan.STUDENT.getName())) {
+            servicePlan = ServicePlan.STUDENT;
+        } else {
+            servicePlan = ServicePlan.STANDARD;
+        }
     }
 
     public Account getFirstClassicAccount(String currency) {
@@ -69,9 +76,8 @@ public class User implements ObjectNodeAcceptor, TransactionListener {
     }
 
     public void setPlan(ServicePlan servicePlan) {
-        for (Account account : getAccounts()) {
-            account.setServicePlan(servicePlan);
-        }
+        accounts.forEach(account -> account.setServicePlan(servicePlan));
+        this.servicePlan = servicePlan;
     }
 
     /**

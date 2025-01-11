@@ -18,7 +18,7 @@ public class ChangeDepositLimitAction extends Action {
                 throw new RuntimeException("This is not a business account");
             }
             if (!associates.changeDepositLimit(user, commandInput.getAmount())) {
-                throw new RuntimeException("You must be owner in order to change spending limit.");
+                throw new RuntimeException("You must be owner in order to change deposit limit.");
             }
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());
