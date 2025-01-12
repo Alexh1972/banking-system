@@ -11,15 +11,21 @@ import org.poo.bank.entity.account.Associate;
 import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.user.User;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AssociateReportCommerciantConverter implements AssociateReportConverter {
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ObjectNode toObjectNode(Associates associates, Integer start, Integer finish) {
+    public final ObjectNode toObjectNode(
+            final Associates associates,
+            final Integer start,
+            final Integer finish
+    ) {
         Account account = BankSingleton.getInstance().getAccount(associates.getIban());
         ObjectNode objectNode = MAPPER.createObjectNode();
 
@@ -40,7 +46,12 @@ public class AssociateReportCommerciantConverter implements AssociateReportConve
         return objectNode;
     }
 
-    public ObjectNode toObjectNode(Associates associates, Commerciant commerciant, Integer start, Integer finish) {
+    private ObjectNode toObjectNode(
+            final Associates associates,
+            final Commerciant commerciant,
+            final Integer start,
+            final Integer finish
+    ) {
         Bank bank = BankSingleton.getInstance();
         ObjectNode objectNode = MAPPER.createObjectNode();
 
@@ -51,7 +62,12 @@ public class AssociateReportCommerciantConverter implements AssociateReportConve
             }
 
             List<Associate> associateList = new ArrayList<>();
-            for (Associate.AssociateInformation information : associates.getCommerciantSpending(commerciant, start, finish)) {
+            for (Associate.AssociateInformation information
+                    : associates.getCommerciantSpending(
+                            commerciant,
+                            start,
+                            finish)
+            ) {
                 User user = bank.getUser(information.getUser());
                 Associate associate = associates.getAssociate(user);
                 if (associate.getType().equals(type)) {
@@ -76,10 +92,12 @@ public class AssociateReportCommerciantConverter implements AssociateReportConve
     }
 
 
-    public ArrayNode toArrayNode(List<Associate> associates) {
+    private ArrayNode toArrayNode(final List<Associate> associates) {
         ArrayNode arrayNode = MAPPER.createArrayNode();
         for (Associate associate : associates) {
-            arrayNode.add(associate.getUser().getLastName() + " " + associate.getUser().getFirstName());
+            arrayNode.add(associate.getUser().getLastName()
+                    + " "
+                    + associate.getUser().getFirstName());
         }
         return arrayNode;
     }

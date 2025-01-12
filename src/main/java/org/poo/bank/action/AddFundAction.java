@@ -25,12 +25,14 @@ public class AddFundAction extends Action {
             if (bank.isAssociate(account, user)) {
                 Associates associates = bank.getAssociates(account);
                 if (!associates.canAddFunds(user, commandInput.getAmount())) {
-//                    throw new RuntimeException("You are not authorized to make this transaction.");
                     return null;
                 }
 
-                associates.updateAssociateDeposit(user, commandInput.getAmount(), commandInput.getTimestamp());
-            } else if (account.getAccountType().equals(AccountType.ACCOUNT_TYPE_BUSINESS)) {
+                associates.updateAssociateDeposit(user,
+                        commandInput.getAmount(),
+                        commandInput.getTimestamp());
+            } else if (account.getAccountType()
+                    .equals(AccountType.ACCOUNT_TYPE_BUSINESS)) {
                 return null;
             }
             account.addBalance(commandInput.getAmount());

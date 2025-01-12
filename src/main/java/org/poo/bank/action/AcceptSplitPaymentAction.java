@@ -12,14 +12,9 @@ import org.poo.bank.entity.user.User;
 import org.poo.bank.notification.TransactionNotifier;
 import org.poo.fileio.CommandInput;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 public class AcceptSplitPaymentAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             if (commandInput.getEmail() == null) {
                 throw new RuntimeException("User not found");
@@ -31,7 +26,8 @@ public class AcceptSplitPaymentAction extends Action {
                 throw new RuntimeException("User not found");
             }
 
-            SplitPayment splitPayment = bank.getSplitPayment(user, commandInput.getSplitPaymentType());
+            SplitPayment splitPayment =
+                    bank.getSplitPayment(user, commandInput.getSplitPaymentType());
 
             if (splitPayment == null) {
                 return null;

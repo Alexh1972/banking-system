@@ -101,11 +101,31 @@ public interface ObjectNodeVisitor {
      */
     ArrayNode toArrayNode(List<Transaction> transactionList);
 
+    /**
+     * Converts a transaction to an object node.
+     * @param transaction The transaction.
+     * @return The object node.
+     */
     ObjectNode toObjectNode(WithdrawSavingsTransaction transaction);
 
+    /**
+     * Converts a transaction to an object node.
+     * @param transaction The transaction.
+     * @return The object node.
+     */
     ObjectNode toObjectNode(UpgradePlanTransaction transaction);
 
+    /**
+     * Converts a transaction to an object node.
+     * @param transaction The transaction.
+     * @return The object node.
+     */
     ObjectNode toObjectNode(CashWithdrawalTransaction transaction);
 
+    /**
+     * Converts a transaction to an object node.
+     * @param transaction The transaction.
+     * @return The object node.
+     */
     ObjectNode toObjectNode(AddInterestTransaction transaction);
 }

@@ -38,7 +38,8 @@ public class DeleteCardAction extends Action {
 
             Associates associates = bank.getAssociates(account);
             if (associates != null) {
-                if (!associates.getAssociate(user).getType().getCanDeleteAnyCard() && !card.getOwnerEmail().equals(user.getEmail())) {
+                if (!associates.getAssociate(user).getType().getCanDeleteAnyCard()
+                        && !card.getOwnerEmail().equals(user.getEmail())) {
                     throw new RuntimeException("You are not authorized to make this transaction.");
                 }
             }

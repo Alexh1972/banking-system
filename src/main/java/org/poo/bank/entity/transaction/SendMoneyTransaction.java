@@ -5,9 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 @Setter
 @Getter
 public class SendMoneyTransaction extends CommerciantTransaction {

@@ -2,17 +2,15 @@ package org.poo.bank.action;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
-import org.poo.bank.BankSingleton;
 import org.poo.bank.entity.Commerciant;
-import org.poo.bank.entity.account.Associate;
+import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.account.ServicePlan;
-import org.poo.bank.entity.user.User;
-import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;
 import org.poo.bank.entity.account.card.CardType;
 import org.poo.bank.entity.transaction.*;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.notification.TransactionNotifier;
 import org.poo.fileio.CommandInput;
 import org.poo.utils.Utils;
@@ -38,6 +36,7 @@ public class CardPaymentAction extends Action {
 
             Account account = bank.getAccount(card);
             User user = bank.getUser(commandInput.getEmail());
+            User owner = bank.getUser(account);
 
             Double amountSpent = bank.getAmount(commandInput.getAmount(),
                     commandInput.getCurrency(),
@@ -45,7 +44,7 @@ public class CardPaymentAction extends Action {
 
             Double noCommissionAmount = amountSpent;
 
-            amountSpent += account.getServicePlan().getCommission(amountSpent, account.getCurrency());
+            amountSpent += owner.getServicePlan().getCommission(amountSpent, account.getCurrency());
             Double cashbackAmount = noCommissionAmount * commerciant
                     .getCashbackStrategy()
                     .getCashbackRate(account, commerciant, noCommissionAmount);
@@ -61,13 +60,18 @@ public class CardPaymentAction extends Action {
                 }
                 transferResult = account.subtractBalance(finalAmountSpent, card);
             } else if (bank.isAssociate(account, user)) {
-                if (associates.canPay(user, finalAmountSpent, account.getCurrency())) {
+                if (associates.canPay(user, finalAmountSpent)) {
                     transferResult = account.subtractBalance(finalAmountSpent, card);
                     if (transferResult.equals(TransferType.TRANSFER_TYPE_SUCCESSFUL)) {
-                        associates.updateAssociatePayment(user, noCommissionAmount, commerciant, commandInput.getTimestamp());
+                        associates.updateAssociatePayment(
+                                user,
+                                noCommissionAmount,
+                                commerciant,
+                                commandInput.getTimestamp());
                     }
                 } else {
-                    transferResult = TransferType.TRANSFER_TYPE_INSUFFICIENT_FUNDS;
+                    transferResult =
+                            TransferType.TRANSFER_TYPE_INSUFFICIENT_FUNDS;
                 }
             } else {
                 throw new RuntimeException("Card not found");
@@ -119,7 +123,7 @@ public class CardPaymentAction extends Action {
                     }
 
                     if (account.canUpgradePlan(amountSpent)) {
-                        account.setServicePlan(ServicePlan.GOLD);
+                        user.setServicePlan(ServicePlan.GOLD);
                         TransactionNotifier.notify(new UpgradePlanTransaction(
                                         ServicePlan.GOLD.getName(),
                                         account.getIban(),

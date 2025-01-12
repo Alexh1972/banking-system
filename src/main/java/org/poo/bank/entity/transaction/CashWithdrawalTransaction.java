@@ -6,13 +6,23 @@ import org.poo.bank.visitor.ObjectNodeVisitor;
 @Getter
 public class CashWithdrawalTransaction extends Transaction {
     private Double amount;
-    public CashWithdrawalTransaction(Double amount, Integer timestamp) {
-        super(TransactionMessage.TRANSACTION_MESSAGE_CASH_WITHDRAW.getValue().replace("{amount}", amount.toString()), timestamp);
+    public CashWithdrawalTransaction(
+            final Double amount,
+            final Integer timestamp
+    ) {
+        super(TransactionMessage
+                        .TRANSACTION_MESSAGE_CASH_WITHDRAW
+                        .getValue()
+                        .replace("{amount}", amount.toString()),
+                timestamp);
         this.amount = amount;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ObjectNode accept(ObjectNodeVisitor objectNodeVisitor) {
+    public ObjectNode accept(final ObjectNodeVisitor objectNodeVisitor) {
         return objectNodeVisitor.toObjectNode(this);
     }
 }

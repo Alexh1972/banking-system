@@ -13,7 +13,7 @@ import org.poo.fileio.CommandInput;
 
 public class UpgradePlanAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             Account account = bank.getAccount(commandInput.getAccount());
 
@@ -24,22 +24,23 @@ public class UpgradePlanAction extends Action {
             User user = bank.getUser(account);
 
             ServicePlan newServicePlan = ServicePlan.getServicePlan(commandInput.getNewPlanType());
-            if (account.getServicePlan().equals(newServicePlan)) {
-                TransactionNotifier.notify(new BaseTransaction("The user already has the " + account.getServicePlan().getName() + " plan.", commandInput.getTimestamp()),
+            if (user.getServicePlan().equals(newServicePlan)) {
+                TransactionNotifier.notify(new BaseTransaction(
+                        "The user already has the " + user.getServicePlan().getName() + " plan.",
+                                commandInput.getTimestamp()),
                         user,
                         account
                 );
                 return null;
             }
 
-            if (!ServicePlan.isUpgrade(account.getServicePlan(), newServicePlan)) {
-//                throw new RuntimeException("You cannot downgrade your plan.");
+            if (!ServicePlan.isUpgrade(user.getServicePlan(), newServicePlan)) {
                 return null;
             }
 
             Double amount = bank.getAmount(
                     ServicePlan.getUpgradeFee(
-                            account.getServicePlan(),
+                            user.getServicePlan(),
                             newServicePlan),
                     ServicePlan.getFeeCurrency(),
                     account.getCurrency());
@@ -53,7 +54,10 @@ public class UpgradePlanAction extends Action {
                         user,
                         account);
             } else {
-                TransactionNotifier.notify(new BaseTransaction(TransactionMessage.TRANSACTION_MESSAGE_INSUFFICIENT_FUNDS.getValue(),
+                TransactionNotifier.notify(new BaseTransaction(
+                        TransactionMessage
+                                .TRANSACTION_MESSAGE_INSUFFICIENT_FUNDS
+                                .getValue(),
                                 commandInput.getTimestamp()),
                         user,
                         account);

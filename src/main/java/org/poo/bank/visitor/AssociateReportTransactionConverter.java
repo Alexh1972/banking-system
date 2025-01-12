@@ -8,27 +8,37 @@ import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.Associate;
 import org.poo.bank.entity.account.Associates;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AssociateReportTransactionConverter implements AssociateReportConverter {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public ObjectNode toObjectNode(Associate associate, Integer start, Integer finish) {
+    private ObjectNode toObjectNode(
+            final Associate associate,
+            final Integer start,
+            final Integer finish
+    ) {
         ObjectNode objectNode = MAPPER.createObjectNode();
 
         Double spent = associate.getSpent(start, finish);
         Double deposited = associate.getDeposited(start, finish);
 
-        objectNode.put("username", associate.getUser().getLastName() + " " + associate.getUser().getFirstName());
+        objectNode.put(
+                "username",
+                associate.getUser().getLastName()
+                        + " "
+                        + associate.getUser().getFirstName());
         objectNode.put("spent", spent);
         objectNode.put("deposited", deposited);
         return objectNode;
     }
 
-    public ArrayNode toArrayNode(List<Associate> associates, Integer start, Integer finish) {
+    private ArrayNode toArrayNode(
+            final List<Associate> associates,
+            final Integer start,
+            final Integer finish
+    ) {
         ArrayNode arrayNode = MAPPER.createArrayNode();
         for (Associate associate : associates) {
             arrayNode.add(toObjectNode(associate, start, finish));
@@ -36,9 +46,17 @@ public class AssociateReportTransactionConverter implements AssociateReportConve
         return arrayNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ObjectNode toObjectNode(Associates associates, Integer start, Integer finish) {
-        Account account = BankSingleton.getInstance().getAccount(associates.getIban());
+    public final ObjectNode toObjectNode(
+            final Associates associates,
+            final Integer start,
+            final Integer finish
+    ) {
+        Account account = BankSingleton.getInstance()
+                .getAccount(associates.getIban());
         ObjectNode objectNode = MAPPER.createObjectNode();
 
         objectNode.put("IBAN", account.getIban());
@@ -57,7 +75,15 @@ public class AssociateReportTransactionConverter implements AssociateReportConve
                     }
                 }
 
-                objectNode.put(type.getName() + "s", toArrayNode(associateList, start, finish));
+                objectNode.put(
+                        type.getName()
+                                + "s",
+                        toArrayNode(
+                                associateList,
+                                start,
+                                finish
+                        )
+                );
             }
         }
 

@@ -4,16 +4,21 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.poo.bank.entity.*;
+import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.Associate;
 import org.poo.bank.entity.account.Associates;
-import org.poo.bank.entity.user.User;
-import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
-import org.poo.bank.strategy.cashback.CashbackStrategy;
-import org.poo.fileio.*;
+import org.poo.bank.entity.user.User;
+import org.poo.fileio.CommerciantInput;
+import org.poo.fileio.ExchangeInput;
+import org.poo.fileio.ObjectInput;
+import org.poo.fileio.UserInput;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -101,31 +106,66 @@ public class Bank {
         combineRates(rates);
     }
 
-    public Commerciant getCommerciant(String commerciant) {
+    /**
+     * Get commerciant by name.
+     * @param commerciant Commerciant's name.
+     * @return The commerciant.
+     */
+    public final Commerciant getCommerciant(final String commerciant) {
         return commerciantMap.get(commerciant);
     }
 
-    public void addAssociate(Account account, String email, String type) {
+    /**
+     * Adds new associate to the account.
+     * @param account The account.
+     * @param email The associate's user email.
+     * @param type The type of the associate.
+     */
+    public final void addAssociate(final Account account, final String email, final String type) {
         addAssociate(account, getUser(email), type);
     }
 
-    public Commerciant getCommerciantByIban(String iban) {
+    /**
+     * Get commerciant by account's IBAN.
+     * @param iban The IBAN.
+     * @return The commerciant.
+     */
+    public final Commerciant getCommerciantByIban(final String iban) {
         return commerciantIbanMap.get(iban);
     }
 
-    public void addUsedCard(Card card) {
+    /**
+     * Adds card to used cards map.
+     * @param card The card to be added.
+     */
+    public final void addUsedCard(final Card card) {
         usedCards.put(card.getCardNumber(), card);
     }
 
-    public void addSplitPayment(SplitPayment payment) {
+    /**
+     * Adds a split payment.
+     * @param payment The payment.
+     */
+    public final void addSplitPayment(final SplitPayment payment) {
         splitPayments.add(payment);
     }
 
-    public void removeSplitPayment(SplitPayment payment) {
+    /**
+     * Removes a split payment.
+     * @param payment The payment.
+     */
+    public final void removeSplitPayment(final SplitPayment payment) {
         splitPayments.remove(payment);
     }
 
-    public SplitPayment getSplitPayment(User user, String type) {
+    /**
+     * Gets the first split payment of an user.
+     * @param user The user.
+     * @param type The type of the payment.
+     * @return The split payment if it exists, NULL
+     * otherwise.
+     */
+    public final SplitPayment getSplitPayment(final User user, final String type) {
         for (SplitPayment splitPayment : splitPayments) {
             if (splitPayment.getAccount(user) != null && splitPayment.getType().equals(type)) {
                 return splitPayment;
@@ -135,7 +175,14 @@ public class Bank {
         return null;
     }
 
-    public boolean isUsersAccount(User user, String iban) {
+    /**
+     * Checks if user owns an account.
+     * @param user The user.
+     * @param iban The IBAN of the account.
+     * @return TRUE if the account is owned by the user
+     * FALSE, otherwise.
+     */
+    public final boolean isUsersAccount(final User user, final String iban) {
         for (Account account : user.getAccounts()) {
             if (account.getIban().equals(iban)) {
                 return true;
@@ -145,11 +192,22 @@ public class Bank {
         return false;
     }
 
-    public Card getUsedCard(String card) {
+    /**
+     * Get a specific used card by card number.
+     * @param card The card's number.
+     * @return The used card.
+     */
+    public final Card getUsedCard(final String card) {
         return usedCards.get(card);
     }
 
-    public void addAssociate(Account account, User user, String type) {
+    /**
+     * Adds a new associate to an account.
+     * @param account The account.
+     * @param user The new associate.
+     * @param type The type of association.
+     */
+    public final void addAssociate(final Account account, final User user, final String type) {
         Associates associates = getAssociates(account);
 
         if (associates == null) {
@@ -161,7 +219,14 @@ public class Bank {
         }
     }
 
-    public boolean isAssociate(Account account, User user) {
+    /**
+     * Checks if a user is associated with an account.
+     * @param account The account.
+     * @param user The user.
+     * @return TRUE if user is associated to the account,
+     * FALSE otherwise.
+     */
+    public final boolean isAssociate(final Account account, final User user) {
         Associates associates = getAssociates(account);
 
         if (associates == null) {
@@ -172,7 +237,12 @@ public class Bank {
         return  associate != null;
     }
 
-    public Associates getAssociates(Account account) {
+    /**
+     * Gets the associates of an account.
+     * @param account The account.
+     * @return The associates.
+     */
+    public final Associates getAssociates(final Account account) {
         return associateMap.get(account);
     }
 
@@ -350,6 +420,11 @@ public class Bank {
         return userAccountMap.get(account);
     }
 
+    /**
+     * Gets the user owner of the card.
+     * @param card The card.
+     * @return The user that owns the card.
+     */
     public final User getUser(final Card card) {
         return getUser(getAccount(card));
     }

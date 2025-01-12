@@ -30,14 +30,25 @@ public class SendMoneyAction extends Action {
                         throw new RuntimeException("User not found");
                     }
                     Double amount = commandInput.getAmount();
-                    Double commission = sender.getServicePlan().getCommission(commandInput.getAmount(), sender.getCurrency());
-                    Double cashbackAmount = commerciant.getCashbackStrategy().getCashbackRate(sender, commerciant, amount) * amount;
+
+                    Double commission = senderUser
+                            .getServicePlan()
+                            .getCommission(
+                                    commandInput.getAmount(),
+                                    sender.getCurrency()
+                            );
+
+                    Double cashbackAmount =
+                            commerciant.getCashbackStrategy().getCashbackRate(
+                                    sender,
+                                    commerciant,
+                                    amount
+                            )
+                            * amount;
+
                     Double amountSent = commandInput.getAmount() + commission - cashbackAmount;
 
                     if (sender.subtractBalance(amountSent)) {
-                        if (sender.getIban().equals("RO01POOB9893132718323396") && commandInput.getTimestamp() >= 777) {
-                        int a = 1;
-                    }
                         commerciant.getCashbackStrategy().updateCashback(sender, commerciant);
                         TransactionNotifier.notify(new SendMoneyTransaction(
                                         commandInput.getDescription(),
@@ -67,7 +78,12 @@ public class SendMoneyAction extends Action {
                     sender.getCurrency(),
                     receiver.getCurrency());
 
-            Double commission = sender.getServicePlan().getCommission(commandInput.getAmount(), sender.getCurrency());
+            Double commission =
+                    senderUser.getServicePlan().getCommission(
+                            commandInput.getAmount(),
+                            sender.getCurrency()
+                    );
+
             Double amountSent = commandInput.getAmount() + commission;
 
             if (sender.subtractBalance(amountSent)) {
@@ -111,7 +127,7 @@ public class SendMoneyAction extends Action {
                 }
 
                 if (sender.canUpgradePlan(amountSent)) {
-                    sender.setServicePlan(ServicePlan.GOLD);
+                    senderUser.setServicePlan(ServicePlan.GOLD);
                     TransactionNotifier.notify(new UpgradePlanTransaction(
                                     ServicePlan.GOLD.getName(),
                                     sender.getIban(),

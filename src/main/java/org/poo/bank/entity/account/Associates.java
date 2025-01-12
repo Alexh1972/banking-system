@@ -1,18 +1,16 @@
 package org.poo.bank.entity.account;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import org.poo.bank.Bank;
 import org.poo.bank.BankSingleton;
 import org.poo.bank.entity.Commerciant;
 import org.poo.bank.entity.user.User;
-import org.poo.bank.visitor.ObjectNodeAcceptor;
-import org.poo.bank.visitor.ObjectNodeVisitor;
 
 import java.util.*;
 
 @Data
 public class Associates {
+    private static final Double DEFAULT_LIMIT = 500.0;
     private List<Associate> associates;
     private Map<User, Associate> associateMap;
     private Map<Commerciant, List<Associate.AssociateInformation>> informationMap;
@@ -21,18 +19,23 @@ public class Associates {
     private String currency;
     private String iban;
 
-    public Associates(Account account) {
+    public Associates(final Account account) {
         Bank bank = BankSingleton.getInstance();
         associates = new ArrayList<>();
         associateMap = new HashMap<>();
         informationMap = new HashMap<>();
-        paymentLimit = bank.getAmount(500.0, getDefaultCurrency(), account.getCurrency());
-        depositLimit = bank.getAmount(500.0, getDefaultCurrency(), account.getCurrency());
+        paymentLimit = bank.getAmount(DEFAULT_LIMIT, getDefaultCurrency(), account.getCurrency());
+        depositLimit = bank.getAmount(DEFAULT_LIMIT, getDefaultCurrency(), account.getCurrency());
         iban = account.getIban();
         currency = "RON";
     }
 
-    public void addAssociate(User user, Associate.AssociateType type) {
+    /**
+     * Adds a new associate.
+     * @param user The user.
+     * @param type The association type.
+     */
+    public final void addAssociate(final User user, final Associate.AssociateType type) {
         Associate associate = new Associate(user, type);
 
         if (!associateMap.containsKey(user)) {
@@ -41,11 +44,23 @@ public class Associates {
         }
     }
 
-    public void addAssociate(User user, String type) {
+    /**
+     * Adds a new associate.
+     * @param user The user.
+     * @param type The association type.
+     */
+    public final void addAssociate(final User user, final String type) {
         addAssociate(user, Associate.AssociateType.getAssociateType(type));
     }
 
-    public boolean changeDepositLimit(User user, Double amount) {
+    /**
+     * Changes the deposit limit if user has permission.
+     * @param user The user.
+     * @param amount The new deposit limit.
+     * @return TRUE if operation was done successfully,
+     * FALSE otherwise.
+     */
+    public final boolean changeDepositLimit(final User user, final Double amount) {
         if (getAssociate(user).getType().getCanChangeLimits()) {
             depositLimit = amount;
             return true;
@@ -54,7 +69,14 @@ public class Associates {
         return false;
     }
 
-    public boolean changePaymentLimit(User user, Double amount) {
+    /**
+     * Changes the payment limit if user has permission.
+     * @param user The user.
+     * @param amount The new payment limit.
+     * @return TRUE if operation was done successfully,
+     * FALSE otherwise.
+     */
+    public final boolean changePaymentLimit(final User user, final Double amount) {
         Associate associate = getAssociate(user);
         if (associate == null) {
             return true;
@@ -68,59 +90,134 @@ public class Associates {
         return false;
     }
 
-    public Associate getAssociate(User user) {
+    /**
+     * Gets the associate.
+     * @param user The user associate.
+     * @return The associate.
+     */
+    public final Associate getAssociate(final User user) {
         return associateMap.get(user);
     }
 
-    public boolean canPay(User user, Double amount, String currency) {
+    /**
+     * Checks if user can pay a specific amount.
+     * @param user The user.
+     * @param amount The amount.
+     * @return TRUE if user has permission to pay,
+     * FALSE otherwise.
+     */
+    public final boolean canPay(final User user, final Double amount) {
         Associate associate = getAssociate(user);
         Associate.AssociateType associateType = associate.getType();
 
         return !associateType.getHasPaymentLimit() ||  amount <= paymentLimit;
     }
 
-    public void updateAssociatePayment(User user, Double amount, Integer timestamp) {
+    /**
+     * Updates associate payments.
+     * @param user The user.
+     * @param amount The amount paid.
+     * @param timestamp The timestamp.
+     */
+    public final void updateAssociatePayment(
+            final User user,
+            final Double amount,
+            final Integer timestamp
+    ) {
         Associate associate = getAssociate(user);
-        associate.addPayment(user, amount, timestamp);
+        associate.addPayment(amount, timestamp);
     }
-    public void updateAssociatePayment(User user, Double amount, Commerciant commerciant, Integer timestamp) {
-        Associate associate = getAssociate(user);
-        Associate.AssociateInformation associateInformation = associate.addPayment(user, amount, timestamp);
 
-        List<Associate.AssociateInformation> list = informationMap.get(commerciant);
-        if (list == null) {
-            list = new ArrayList<>();
-            informationMap.put(commerciant, list);
-        }
+    /**
+     * Updates associate payments.
+     * @param user The user.
+     * @param amount The amount paid.
+     * @param commerciant The commerciant paid.
+     * @param timestamp The timestamp.
+     */
+    public final void updateAssociatePayment(
+            final User user,
+            final Double amount,
+            final Commerciant commerciant,
+            final Integer timestamp
+    ) {
+        Associate associate = getAssociate(user);
+        Associate.AssociateInformation associateInformation =
+                associate.addPayment(amount, timestamp);
+
+        List<Associate.AssociateInformation> list =
+                informationMap.computeIfAbsent(commerciant,
+                        k -> new ArrayList<>());
 
         list.add(associateInformation);
     }
 
-    public List<Associate.AssociateInformation> getCommerciantSpending(Commerciant commerciant, Integer start, Integer end) {
+    /**
+     * Gets the payments for a specific commerciant.
+     * @param commerciant The commerciant.
+     * @param start The start timestamp.
+     * @param end The end timestamp.
+     * @return A list of all payments for the commerciant.
+     */
+    public final List<Associate.AssociateInformation>
+    getCommerciantSpending(
+            final Commerciant commerciant,
+            final Integer start,
+            final Integer end
+    ) {
         List<Associate.AssociateInformation> list = informationMap.get(commerciant);
 
         if (list == null) {
             return null;
         }
 
-        return list.stream().filter(a -> a.getTimestamp() >= start && a.getTimestamp() <= end).toList();
+        return list.stream()
+                .filter(a -> a.getTimestamp() >= start && a.getTimestamp() <= end)
+                .toList();
     }
 
-    public List<Commerciant> getCommerciantList() {
-        return informationMap.keySet().stream().sorted(Comparator.comparing(Commerciant::getName)).toList();
+    /**
+     * Get commerciants paid by the associates.
+     * @return The commerciant list.
+     */
+    public final List<Commerciant> getCommerciantList() {
+        return informationMap.keySet().stream()
+                .sorted(Comparator.comparing(Commerciant::getName))
+                .toList();
     }
-    public void updateAssociateDeposit(User user, Double amount, Integer timestamp) {
+
+    /**
+     * Updates the deposit of a user.
+     * @param user The user.
+     * @param amount The amount deposited.
+     * @param timestamp The timestamp.
+     */
+    public final void updateAssociateDeposit(
+            final User user,
+            final Double amount,
+            final Integer timestamp
+    ) {
         Associate associate = getAssociate(user);
         associate.addDeposit(amount, timestamp);
     }
 
-    public boolean canAddFunds(User user, Double amount) {
+    /**
+     * Checks if user has permission to add funds.
+     * @param user The user.
+     * @param amount The amount.
+     * @return TRUE if user can add funds,
+     * FALSE otherwise.
+     */
+    public final boolean canAddFunds(final User user, final Double amount) {
         Associate.AssociateType associateType = getAssociate(user).getType();
-        boolean answer = associateType.getCanAddFunds() || amount <= depositLimit;
-        return answer;
+        return associateType.getCanAddFunds() || amount <= depositLimit;
     }
 
-    public String getDefaultCurrency() {
+    /**
+     * Get the default currency for associates.
+     * @return The currency.
+     */
+    public final String getDefaultCurrency() {
         return "RON";
     }
 }

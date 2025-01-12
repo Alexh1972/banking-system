@@ -11,7 +11,13 @@ public class Commerciant {
     private CommerciantType type;
     private CashbackStrategy cashbackStrategy;
 
-    public Commerciant(String name, Integer id, String accountIban, String type, String cashbackStrategy) {
+    public Commerciant(
+            final String name,
+            final Integer id,
+            final String accountIban,
+            final String type,
+            final String cashbackStrategy
+    ) {
         this.name = name;
         this.id = id;
         this.accountIban = accountIban;

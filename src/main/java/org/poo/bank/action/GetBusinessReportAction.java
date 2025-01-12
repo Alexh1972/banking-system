@@ -9,7 +9,7 @@ import org.poo.fileio.CommandInput;
 
 public class GetBusinessReportAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         AssociateReportConverter objectNodeConverter = null;
 
         if (commandInput.getType().equals("transaction")) {
@@ -22,7 +22,9 @@ public class GetBusinessReportAction extends Action {
         Associates associates = bank.getAssociates(account);
         ObjectNode objectNode = getMapper().createObjectNode();
         objectNode.put("output",
-                objectNodeConverter.toObjectNode(associates, commandInput.getStartTimestamp(), commandInput.getEndTimestamp()));
+                objectNodeConverter.toObjectNode(associates,
+                        commandInput.getStartTimestamp(),
+                        commandInput.getEndTimestamp()));
         return objectNode;
     }
 }

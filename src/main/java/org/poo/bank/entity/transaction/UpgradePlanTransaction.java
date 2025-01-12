@@ -7,14 +7,21 @@ import org.poo.bank.visitor.ObjectNodeVisitor;
 public class UpgradePlanTransaction extends Transaction {
     private String newPlanType;
     private String accountIban;
-    public UpgradePlanTransaction(String newPlanType, String accountIban, Integer timestamp) {
+    public UpgradePlanTransaction(
+            final String newPlanType,
+            final String accountIban,
+            final Integer timestamp
+    ) {
         super(TransactionMessage.TRANSACTION_MESSAGE_UPGRADE_PLAN.getValue(), timestamp);
         this.newPlanType = newPlanType;
         this.accountIban = accountIban;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ObjectNode accept(ObjectNodeVisitor objectNodeVisitor) {
+    public ObjectNode accept(final ObjectNodeVisitor objectNodeVisitor) {
         return objectNodeVisitor.toObjectNode(this);
     }
 }

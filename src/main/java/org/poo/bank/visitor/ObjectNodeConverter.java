@@ -3,26 +3,18 @@ package org.poo.bank.visitor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.poo.bank.BankSingleton;
-import org.poo.bank.entity.account.Associate;
-import org.poo.bank.entity.account.Associates;
-import org.poo.bank.entity.transaction.*;
-import org.poo.bank.entity.user.User;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
+import org.poo.bank.entity.transaction.*;
+import org.poo.bank.entity.user.User;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ObjectNodeConverter implements ObjectNodeVisitor {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
-     * Converts a user to an object node.
-     * @param user The user.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final User user) {
@@ -47,9 +39,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final Transaction transaction) {
@@ -62,9 +52,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts an account to an object node.
-     * @param account The account.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final Account account) {
@@ -91,9 +79,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a card to an object node.
-     * @param card The card.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final Card card) {
@@ -106,9 +92,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final CreateAccountTransaction transaction) {
@@ -116,9 +100,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final CreateCardTransaction transaction) {
@@ -132,9 +114,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final InsufficientFundsTransaction transaction) {
@@ -142,9 +122,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final SendMoneyTransaction transaction) {
@@ -157,9 +135,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final CardPaymentTransaction transaction) {
@@ -172,9 +148,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final DeleteCardTransaction transaction) {
@@ -188,9 +162,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final SplitPaymentTransaction transaction) {
@@ -220,9 +192,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction to an object node.
-     * @param transaction The transaction.
-     * @return The object node.
+     * {@inheritDoc}
      */
     @Override
     public final ObjectNode toObjectNode(final SplitPaymentErrorTransaction transaction) {
@@ -233,9 +203,7 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
     }
 
     /**
-     * Converts a transaction list to an array node.
-     * @param transactionList The transaction list.
-     * @return The array node.
+     * {@inheritDoc}
      */
     @Override
     public final ArrayNode toArrayNode(final List<Transaction> transactionList) {
@@ -248,8 +216,13 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         return arrayNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ObjectNode toObjectNode(WithdrawSavingsTransaction transaction) {
+    public final ObjectNode toObjectNode(
+            final WithdrawSavingsTransaction transaction
+    ) {
         ObjectNode objectNode = toObjectNode((Transaction) transaction);
 
         objectNode.put("classicAccountIBAN", transaction.getClassicAccountIBAN());
@@ -258,8 +231,13 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         return objectNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ObjectNode toObjectNode(UpgradePlanTransaction transaction) {
+    public final ObjectNode toObjectNode(
+            final UpgradePlanTransaction transaction
+    ) {
         ObjectNode objectNode = toObjectNode((Transaction) transaction);
 
         objectNode.put("newPlanType", transaction.getNewPlanType());
@@ -267,16 +245,26 @@ public class ObjectNodeConverter implements ObjectNodeVisitor {
         return objectNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ObjectNode toObjectNode(CashWithdrawalTransaction transaction) {
+    public final ObjectNode toObjectNode(
+            final CashWithdrawalTransaction transaction
+    ) {
         ObjectNode objectNode = toObjectNode((Transaction) transaction);
 
         objectNode.put("amount", transaction.getAmount());
         return objectNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ObjectNode toObjectNode(AddInterestTransaction transaction) {
+    public final ObjectNode toObjectNode(
+            final AddInterestTransaction transaction
+    ) {
         ObjectNode objectNode = toObjectNode((Transaction) transaction);
 
         objectNode.put("amount", transaction.getAmount());

@@ -15,7 +15,7 @@ import org.poo.fileio.CommandInput;
 
 public class CashWithdrawalAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             if (commandInput.getEmail() == null || commandInput.getEmail().isEmpty()) {
                 throw new RuntimeException("User not found");
@@ -37,18 +37,26 @@ public class CashWithdrawalAction extends Action {
             }
 
             Double amount = bank.getAmount(commandInput.getAmount(), "RON", account.getCurrency());
-            Double commissionAmount = amount + account.getServicePlan().getCommission(amount, account.getCurrency());
+            Double commissionAmount =
+                    amount + user.getServicePlan().getCommission(amount, account.getCurrency());
 
             TransferType transferType = account.subtractBalance(commissionAmount, card);
             switch (transferType) {
-                case TRANSFER_TYPE_SUCCESSFUL -> TransactionNotifier.notify(new CashWithdrawalTransaction(commandInput.getAmount(),
+                case TRANSFER_TYPE_SUCCESSFUL -> TransactionNotifier.notify(
+                        new CashWithdrawalTransaction(commandInput.getAmount(),
                                 commandInput.getTimestamp()),
                         user,
                         account);
-                case TRANSFER_TYPE_INSUFFICIENT_FUNDS -> TransactionNotifier.notify(new BaseTransaction(TransactionMessage.TRANSACTION_MESSAGE_INSUFFICIENT_FUNDS.getValue(),
+                case TRANSFER_TYPE_INSUFFICIENT_FUNDS -> TransactionNotifier.notify(
+                        new BaseTransaction(TransactionMessage
+                                .TRANSACTION_MESSAGE_INSUFFICIENT_FUNDS
+                                .getValue(),
                                 commandInput.getTimestamp()),
                         user,
                         account);
+                default -> {
+                    return null;
+                }
             }
         } catch (RuntimeException e) {
             return executeError(e.getMessage(), commandInput.getTimestamp());

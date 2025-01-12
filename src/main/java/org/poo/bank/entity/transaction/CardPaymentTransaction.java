@@ -15,12 +15,21 @@ public class CardPaymentTransaction extends CommerciantTransaction implements Ob
     private Double amount;
     private String currency;
     private Double amountNoCashback;
-    public CardPaymentTransaction(final String commerciantName,
-                                  final Double amount,
-                                  final Double amountNoCashback,
-                                  final Integer timestamp,
-                                  final Account account) {
-        super(TransactionMessage.TRANSACTION_MESSAGE_CARD_PAYMENT.getValue(), timestamp, commerciantName, true, amount, account.getCurrency());
+    public CardPaymentTransaction(
+            final String commerciantName,
+            final Double amount,
+            final Double amountNoCashback,
+            final Integer timestamp,
+            final Account account
+    ) {
+        super(TransactionMessage
+                .TRANSACTION_MESSAGE_CARD_PAYMENT
+                .getValue(),
+                timestamp,
+                commerciantName,
+                true,
+                amount,
+                account.getCurrency());
         this.amount = amount;
         this.amountNoCashback = amountNoCashback;
         this.currency = account.getCurrency();

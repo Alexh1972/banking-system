@@ -9,7 +9,7 @@ import org.poo.fileio.CommandInput;
 
 public class ChangeSpendingLimitAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             Account account = bank.getAccount(commandInput.getAccount());
             User user = bank.getUser(commandInput.getEmail());

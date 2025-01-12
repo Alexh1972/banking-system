@@ -62,7 +62,12 @@ public final class Utils {
         cardRandom = new Random(CARD_SEED);
     }
 
-    public static LocalDateTime convertDate(String str) {
+    /**
+     * Converts a string into a date (pattern "yyyy-MM-dd").
+     * @param str The string.
+     * @return The date.
+     */
+    public static LocalDateTime convertDate(final String str) {
         return LocalDate.parse(str, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
     }
 }

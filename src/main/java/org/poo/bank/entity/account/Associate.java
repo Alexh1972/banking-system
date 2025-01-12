@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.poo.bank.entity.user.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -15,54 +14,75 @@ public class Associate {
     private List<AssociateInformation> deposited;
     private List<AssociateInformation> spent;
 
-    public Associate(User user, String type) {
+    public Associate(final User user, final String type) {
         this(user, AssociateType.getAssociateType(type));
     }
 
-    public Associate(User user, AssociateType type) {
+    public Associate(final User user, final AssociateType type) {
         this.user = user;
         this.type = type;
         this.deposited = new ArrayList<>();
         this.spent = new ArrayList<>();
     }
 
-    public Double getSpent(Integer start, Integer finish) {
-        Double spent = 0.0;
+    /**
+     * Get the amount spent by associate between 2 timestamps.
+     * @param start Start timestamp.
+     * @param finish Finish timestamp.
+     * @return The amount spent;
+     */
+    public final Double getSpent(final Integer start, final Integer finish) {
+        Double spentAmount = 0.0;
         for (AssociateInformation pair : getSpent().stream().filter(
-                s -> s.getTimestamp() >= start &&
-                        s.getTimestamp() <= finish
+                s -> s.getTimestamp() >= start
+                        && s.getTimestamp() <= finish
         ).toList()) {
-            spent += pair.getValue();
+            spentAmount += pair.getValue();
         }
 
-        return spent;
+        return spentAmount;
     }
 
-    public Double getDeposited(Integer start, Integer finish) {
-        Double deposited = 0.0;
+    /**
+     * Get the amount deposited by associate between 2 timestamps.
+     * @param start Start timestamp.
+     * @param finish Finish timestamp.
+     * @return The deposited spent;
+     */
+    public final Double getDeposited(final Integer start, final Integer finish) {
+        Double depositedAmount = 0.0;
         for (AssociateInformation pair : getDeposited().stream().filter(
-                s -> s.getTimestamp() >= start &&
-                        s.getTimestamp() <= finish
+                s -> s.getTimestamp() >= start
+                        && s.getTimestamp() <= finish
         ).toList()) {
-            deposited += pair.getValue();
+            depositedAmount += pair.getValue();
         }
 
-        return deposited;
+        return depositedAmount;
     }
 
-    public AssociateInformation addPayment(Double add, Integer timestamp) {
-        AssociateInformation associateInformation = new AssociateInformation(add, timestamp);
+    /**
+     * Adds a new payment to a specific timestamp for a user.
+     * @param add The payment amount.
+     * @param timestamp The timestamp.
+     * @return The information about the payment.
+     */
+    public final AssociateInformation addPayment(
+            final Double add,
+            final Integer timestamp
+    ) {
+        AssociateInformation associateInformation =
+                new AssociateInformation(add, timestamp, this.user);
         spent.add(associateInformation);
         return associateInformation;
     }
 
-    public AssociateInformation addPayment(User user, Double add, Integer timestamp) {
-        AssociateInformation associateInformation = new AssociateInformation(add, timestamp, user);
-        spent.add(associateInformation);
-        return associateInformation;
-    }
-
-    public void addDeposit(Double add, Integer timestamp) {
+    /**
+     * Adds a new deposit to a specific timestamp.
+     * @param add The deposit amount.
+     * @param timestamp The timestamp.
+     */
+    public final void addDeposit(final Double add, final Integer timestamp) {
         deposited.add(new AssociateInformation(add, timestamp));
     }
 
@@ -72,11 +92,11 @@ public class Associate {
         private final Integer timestamp;
         private final String user;
 
-        public AssociateInformation(Double value, Integer timestamp) {
+        public AssociateInformation(final Double value, final Integer timestamp) {
             this(value, timestamp, null);
         }
 
-        public AssociateInformation(Double value, Integer timestamp, User user) {
+        public AssociateInformation(final Double value, final Integer timestamp, final User user) {
             this.value = value;
             this.timestamp = timestamp;
             if (user != null) {
@@ -118,13 +138,13 @@ public class Associate {
         private final Boolean canAddAssociate;
         private final Boolean canDeleteAccount;
 
-        AssociateType(String name,
-                      Boolean hasPaymentLimit,
-                      Boolean canDeleteAnyCard,
-                      Boolean canChangeLimits,
-                      Boolean canAddFunds,
-                      Boolean canAddAssociate,
-                      Boolean canDeleteAccount) {
+        AssociateType(final String name,
+                      final Boolean hasPaymentLimit,
+                      final Boolean canDeleteAnyCard,
+                      final Boolean canChangeLimits,
+                      final Boolean canAddFunds,
+                      final Boolean canAddAssociate,
+                      final Boolean canDeleteAccount) {
             this.name = name;
             this.hasPaymentLimit = hasPaymentLimit;
             this.canDeleteAnyCard = canDeleteAnyCard;
@@ -134,16 +154,29 @@ public class Associate {
             this.canDeleteAccount = canDeleteAccount;
         }
 
-        public static AssociateType getAssociateType(String str) {
+        /**
+         * Gets the associate type by its name.
+         * @param str The name of the associate type.
+         * @return The associate type.
+         */
+        public static AssociateType getAssociateType(final String str) {
             for (AssociateType associate : AssociateType.values()) {
-                if (str.equals(associate.name))
+                if (str.equals(associate.name)) {
                     return associate;
+                }
             }
 
             return EMPLOYEE;
         }
 
-        public static boolean isUpgrade(AssociateType type1, AssociateType type2) {
+        /**
+         * Checks if a type is superior to another type.
+         * @param type1 The first type.
+         * @param type2 The second type.
+         * @return TRUE if the first type is superior to
+         * the second type, FALSE otherwise.
+         */
+        public static boolean isUpgrade(final AssociateType type1, final AssociateType type2) {
             if (type1.equals(OWNER)) {
                 return type2.equals(MANAGER) || type2.equals(EMPLOYEE);
             } else if (type1.equals(MANAGER)) {

@@ -3,8 +3,6 @@ package org.poo.bank.entity.transaction;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.bank.action.SplitPaymentAction;
-import org.poo.bank.entity.SplitPayment;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 

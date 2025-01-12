@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.Bank;
 import org.poo.bank.entity.SplitPayment;
 import org.poo.bank.entity.account.Account;
-import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.transaction.SplitPaymentErrorTransaction;
 import org.poo.bank.entity.transaction.TransactionMessage;
 import org.poo.bank.entity.user.User;
@@ -13,7 +12,7 @@ import org.poo.fileio.CommandInput;
 
 public class RejectSplitPaymentAction extends Action {
     @Override
-    public ObjectNode execute(Bank bank, CommandInput commandInput) {
+    public final ObjectNode execute(final Bank bank, final CommandInput commandInput) {
         try {
             if (commandInput.getEmail() == null) {
                 throw new RuntimeException("User not found");
@@ -25,7 +24,8 @@ public class RejectSplitPaymentAction extends Action {
                 throw new RuntimeException("User not found");
             }
 
-            SplitPayment splitPayment = bank.getSplitPayment(user, commandInput.getSplitPaymentType());
+            SplitPayment splitPayment = bank.getSplitPayment(user,
+                    commandInput.getSplitPaymentType());
             if (splitPayment == null) {
                 return null;
             }

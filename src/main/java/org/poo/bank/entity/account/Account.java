@@ -13,13 +13,16 @@ import org.poo.bank.entity.user.User;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 @Data
 public class Account implements ObjectNodeAcceptor {
     private static final Double WARNING_BALANCE_THRESHOLD = 30.0;
+    private static final Integer HIGH_AMOUNT_PAYMENTS_THRESHOLD = 5;
+    private static final Double HIGH_AMOUNT_THRESHOLD = 300.0;
     private String iban;
     private Double balance;
     private String currency;
@@ -28,17 +31,15 @@ public class Account implements ObjectNodeAcceptor {
     private Double interestRate;
     private Double minimumBalance;
     private List<Transaction> transactions;
-    private ServicePlan servicePlan;
     private List<Card> usedOneTimeCards;
-    private Integer highSumPayments = 0;
+    private Integer highAmountPayments = 0;
     @Builder
     public Account(final String iban,
                    final Double balance,
                    final String currency,
                    final AccountType accountType,
                    final Double interestRate,
-                   final Double minimumBalance,
-                   final ServicePlan servicePlan) {
+                   final Double minimumBalance) {
         this.iban = iban;
         this.balance = balance;
         this.currency = currency;
@@ -47,8 +48,6 @@ public class Account implements ObjectNodeAcceptor {
         this.minimumBalance = minimumBalance;
         this.cards = new ArrayList<>();
         this.transactions = new ArrayList<>();
-
-        this.servicePlan = servicePlan;
     }
 
     /**
@@ -60,20 +59,29 @@ public class Account implements ObjectNodeAcceptor {
         return amount <= balance;
     }
 
+    /**
+     * Checks if account's owner can upgrade the service plan
+     * after a specific amount of payments and updates the number
+     * of transactions made with an amount higher than a specific threshold.
+     * @param amount The payment amount.
+     * @return TRUE if user cand upgrade plan, FALSE otherwise.
+     */
     public final boolean canUpgradePlan(final Double amount) {
+        User user = BankSingleton.getInstance().getUser(this);
+        ServicePlan servicePlan = user.getServicePlan();
         if (!servicePlan.equals(ServicePlan.SILVER)) {
             return false;
         }
 
-        if (highSumPayments == 5) {
+        if (highAmountPayments == HIGH_AMOUNT_PAYMENTS_THRESHOLD) {
             return true;
         }
         Bank bank = BankSingleton.getInstance();
         Double amountConverted = bank.getAmount(amount, getCurrency(), "RON");
 
-        if (amountConverted >= 300.0) {
-            highSumPayments++;
-            return highSumPayments == 5;
+        if (amountConverted >= HIGH_AMOUNT_THRESHOLD) {
+            highAmountPayments++;
+            return highAmountPayments == HIGH_AMOUNT_PAYMENTS_THRESHOLD;
         }
 
         return false;

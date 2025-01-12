@@ -39,7 +39,8 @@ public class DeleteAccountAction extends Action {
                                 .getValue());
             } else {
                 resultNode.put("error",
-                        TransactionMessage.TRANSACTION_MESSAGE_ACCOUNT_DELETE_ERROR_OUT
+                        TransactionMessage
+                                .TRANSACTION_MESSAGE_ACCOUNT_DELETE_ERROR_OUT
                                 .getValue());
                 TransactionNotifier.notify(
                         new DeleteAccountErrorTransaction(

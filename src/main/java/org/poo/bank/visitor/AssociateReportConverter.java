@@ -1,13 +1,15 @@
 package org.poo.bank.visitor;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.poo.bank.entity.Commerciant;
-import org.poo.bank.entity.account.Associate;
 import org.poo.bank.entity.account.Associates;
 
-import java.util.List;
-
 public interface AssociateReportConverter {
+    /**
+     * Converts associates to object node.
+     * @param associates The associates.
+     * @param start The start timestamp.
+     * @param finish The finish timestamp.
+     * @return The object node.
+     */
     ObjectNode toObjectNode(Associates associates, Integer start, Integer finish);
 }

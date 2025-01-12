@@ -58,26 +58,41 @@ public class User implements ObjectNodeAcceptor, TransactionListener {
         }
     }
 
-    public Account getFirstClassicAccount(String currency) {
+    /**
+     * Gets the first classic account of the user with
+     * a specific currency.
+     * @param currency The currency.
+     * @return The account.
+     */
+    public final Account getFirstClassicAccount(final String currency) {
         for (Account account : accounts) {
-            if (account.getAccountType().equals(AccountType.ACCOUNT_TYPE_CLASSIC) &&
-                    account.getCurrency().equals(currency))
+            if (account.getAccountType().equals(AccountType.ACCOUNT_TYPE_CLASSIC)
+                    && account.getCurrency().equals(currency)) {
                 return account;
+            }
         }
 
         return null;
     }
 
-    public long getAge() {
+    /**
+     * Gets the age of the user.
+     * @return The age of the user.
+     */
+    public final long getAge() {
+        Calendar calendar = Calendar.getInstance();
         return ChronoUnit.YEARS.between(
-                LocalDate.of(birthDate.getYear(), birthDate.getMonth() , birthDate.getDayOfMonth()),
-                LocalDate.of(2024 , 1 , 1)
+                LocalDate.of(birthDate.getYear(), birthDate.getMonth(), birthDate.getDayOfMonth()),
+                LocalDate.of(
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH) + 1,
+                        calendar.get(Calendar.DATE)
+                )
         );
     }
 
-    public void setPlan(ServicePlan servicePlan) {
-        accounts.forEach(account -> account.setServicePlan(servicePlan));
-        this.servicePlan = servicePlan;
+    public final void setPlan(final ServicePlan newServicePlan) {
+        servicePlan = newServicePlan;
     }
 
     /**
