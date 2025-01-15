@@ -6,6 +6,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.bank.entity.account.Account;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.transaction.*;
+import org.poo.bank.entity.transaction.account.AddInterestTransaction;
+import org.poo.bank.entity.transaction.account.CreateAccountTransaction;
+import org.poo.bank.entity.transaction.account.UpgradePlanTransaction;
+import org.poo.bank.entity.transaction.card.CardPaymentTransaction;
+import org.poo.bank.entity.transaction.card.CreateCardTransaction;
+import org.poo.bank.entity.transaction.card.DeleteCardTransaction;
+import org.poo.bank.entity.transaction.payment.InsufficientFundsTransaction;
+import org.poo.bank.entity.transaction.payment.SendMoneyTransaction;
+import org.poo.bank.entity.transaction.payment.splitPayment.SplitPaymentErrorTransaction;
+import org.poo.bank.entity.transaction.payment.splitPayment.SplitPaymentTransaction;
+import org.poo.bank.entity.transaction.withdraw.CashWithdrawalTransaction;
+import org.poo.bank.entity.transaction.withdraw.WithdrawSavingsTransaction;
 import org.poo.bank.entity.user.User;
 
 import java.util.List;
