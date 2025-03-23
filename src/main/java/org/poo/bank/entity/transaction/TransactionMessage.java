@@ -23,7 +23,15 @@ public enum TransactionMessage {
     TRANSACTION_MESSAGE_CARD_STATUS("The card is {status}"),
     TRANSACTION_MESSAGE_CHANGE_INTEREST_RATE("Interest rate of the account changed to {amount}"),
     TRANSACTION_MESSAGE_REPORT_ACCOUNT_TYPE_ERROR("This kind of report is not supported "
-            + "for a saving account");
+            + "for a saving account"),
+    TRANSACTION_MESSAGE_WITHDRAW_SAVINGS_AGE("You don't have the minimum age required."),
+    TRANSACTION_MESSAGE_WITHDRAW_SAVINGS_CLASSIC_ACCOUNT("You do not have a classic account."),
+    TRANSACTION_MESSAGE_WITHDRAW_SAVINGS_SAVINGS_ACCOUNT("Account is not of type savings."),
+    TRANSACTION_MESSAGE_WITHDRAW_SAVINGS("Savings withdrawal"),
+    TRANSACTION_MESSAGE_UPGRADE_PLAN("Upgrade plan"),
+    TRANSACTION_MESSAGE_CASH_WITHDRAW("Cash withdrawal of {amount}"),
+    TRANSACTION_MESSAGE_ADD_INTEREST("Interest rate income"),
+    TRANSACTION_MESSAGE_REJECTED_SPLIT_PAYMENT("One user rejected the payment.");
 
     private final String value;
     TransactionMessage(final String value) {

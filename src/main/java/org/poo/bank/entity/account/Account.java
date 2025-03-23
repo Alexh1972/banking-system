@@ -3,20 +3,26 @@ package org.poo.bank.entity.account;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Builder;
 import lombok.Data;
+import org.poo.bank.Bank;
+import org.poo.bank.BankSingleton;
 import org.poo.bank.entity.account.card.Card;
 import org.poo.bank.entity.account.card.CardStatus;
 import org.poo.bank.entity.transaction.Transaction;
 import org.poo.bank.entity.transaction.TransferType;
+import org.poo.bank.entity.user.User;
 import org.poo.bank.visitor.ObjectNodeAcceptor;
 import org.poo.bank.visitor.ObjectNodeVisitor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 @Data
 public class Account implements ObjectNodeAcceptor {
     private static final Double WARNING_BALANCE_THRESHOLD = 30.0;
+    private static final Integer HIGH_AMOUNT_PAYMENTS_THRESHOLD = 5;
+    private static final Double HIGH_AMOUNT_THRESHOLD = 300.0;
     private String iban;
     private Double balance;
     private String currency;
@@ -25,6 +31,8 @@ public class Account implements ObjectNodeAcceptor {
     private Double interestRate;
     private Double minimumBalance;
     private List<Transaction> transactions;
+    private List<Card> usedOneTimeCards;
+    private Integer highAmountPayments = 0;
     @Builder
     public Account(final String iban,
                    final Double balance,
@@ -52,6 +60,34 @@ public class Account implements ObjectNodeAcceptor {
     }
 
     /**
+     * Checks if account's owner can upgrade the service plan
+     * after a specific amount of payments and updates the number
+     * of transactions made with an amount higher than a specific threshold.
+     * @param amount The payment amount.
+     * @return TRUE if user cand upgrade plan, FALSE otherwise.
+     */
+    public final boolean canUpgradePlan(final Double amount) {
+        User user = BankSingleton.getInstance().getUser(this);
+        ServicePlan servicePlan = user.getServicePlan();
+        if (!servicePlan.equals(ServicePlan.SILVER)) {
+            return false;
+        }
+
+        if (highAmountPayments == HIGH_AMOUNT_PAYMENTS_THRESHOLD) {
+            return true;
+        }
+        Bank bank = BankSingleton.getInstance();
+        Double amountConverted = bank.getAmount(amount, getCurrency(), "RON");
+
+        if (amountConverted >= HIGH_AMOUNT_THRESHOLD) {
+            highAmountPayments++;
+            return highAmountPayments == HIGH_AMOUNT_PAYMENTS_THRESHOLD;
+        }
+
+        return false;
+    }
+
+    /**
      * Checks if the minimum balanced is reached.
      * @return If the minimum balanced is reached.
      */
@@ -72,8 +108,6 @@ public class Account implements ObjectNodeAcceptor {
             if (subtractBalance(subtraction)) {
                 if (balance <= minimumBalance) {
                     card.setStatus(CardStatus.CARD_STATUS_FROZEN);
-                } else if (balance - minimumBalance <= WARNING_BALANCE_THRESHOLD) {
-                    card.setStatus(CardStatus.CARD_STATUS_WARNING);
                 }
 
                 return TransferType.TRANSFER_TYPE_SUCCESSFUL;
@@ -103,7 +137,11 @@ public class Account implements ObjectNodeAcceptor {
      * Adds the interest.
      */
     public final void addInterest() {
-        balance += interestRate * balance;
+        balance += getInterestAmount();
+    }
+
+    public final Double getInterestAmount() {
+        return interestRate * balance;
     }
 
     /**
@@ -120,6 +158,7 @@ public class Account implements ObjectNodeAcceptor {
      */
     public final void transactionUpdate(final Transaction transaction) {
         transactions.add(transaction);
+        transactions.sort(Comparator.comparingInt(Transaction::getTimestamp));
     }
 
     @Override

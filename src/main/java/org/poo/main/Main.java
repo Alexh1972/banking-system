@@ -60,7 +60,7 @@ public final class Main {
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
-                    action(file.getName(), filepath);
+                action(file.getName(), filepath);
             }
         }
 

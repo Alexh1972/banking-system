@@ -3,11 +3,13 @@ package org.poo.bank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.poo.bank.entity.Alias;
-import org.poo.bank.entity.ExchangeRate;
-import org.poo.bank.entity.User;
+import org.poo.bank.entity.*;
 import org.poo.bank.entity.account.Account;
+import org.poo.bank.entity.account.Associate;
+import org.poo.bank.entity.account.Associates;
 import org.poo.bank.entity.account.card.Card;
+import org.poo.bank.entity.user.User;
+import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
 import org.poo.fileio.ObjectInput;
 import org.poo.fileio.UserInput;
@@ -25,6 +27,7 @@ public class Bank {
     private static final String DELIMITER = "$";
     private List<User> users;
     private Map<String, Account> accountIBANMap;
+    private Map<String, Commerciant> commerciantIbanMap;
     private Map<String, User> userEmailMap;
     private Map<Account, User> userAccountMap;
     private Map<String, Card> cardNumberMap;
@@ -32,6 +35,12 @@ public class Bank {
     private Map<String, BigDecimal> exchangeRates;
     private Map<Alias, String> aliasMap;
     private Map<String, String> globalAliasMap;
+    private Map<String, Commerciant> commerciantMap;
+    private List<Commerciant> commerciants;
+    private Map<Account, Associates> associateMap;
+    private Map<String, Card> usedCards;
+    private CashbackRates cashbackRates;
+    private List<SplitPayment> splitPayments;
 
     /**
      * Initialize the bank given input such as exchange rates,
@@ -48,14 +57,37 @@ public class Bank {
         exchangeRates = new HashMap<>();
         aliasMap = new HashMap<>();
         globalAliasMap = new HashMap<>();
+        associateMap = new HashMap<>();
+        commerciants = new ArrayList<>();
+        commerciantMap = new HashMap<>();
+        usedCards = new HashMap<>();
+        cashbackRates = new CashbackRates();
+        splitPayments = new ArrayList<>();
+        commerciantIbanMap = new HashMap<>();
 
         for (UserInput userInput : objectInput.getUsers()) {
             User user = new User(
                     userInput.getFirstName(),
                     userInput.getLastName(),
-                    userInput.getEmail());
+                    userInput.getEmail(),
+                    userInput.getBirthDate(),
+                    userInput.getOccupation());
             users.add(user);
-            userEmailMap.put(userInput.getEmail(), user);
+            if (!userEmailMap.containsKey(userInput.getEmail())) {
+                userEmailMap.put(userInput.getEmail(), user);
+            }
+        }
+
+        for (CommerciantInput commerciantInput : objectInput.getCommerciants()) {
+            Commerciant commerciant = new Commerciant(
+                    commerciantInput.getCommerciant(),
+                    commerciantInput.getId(),
+                    commerciantInput.getAccount(),
+                    commerciantInput.getType(),
+                    commerciantInput.getCashbackStrategy());
+            commerciants.add(commerciant);
+            commerciantMap.put(commerciant.getName(), commerciant);
+            commerciantIbanMap.put(commerciant.getAccountIban(), commerciant);
         }
 
         List<ExchangeRate> rates = new ArrayList<>();
@@ -72,6 +104,146 @@ public class Bank {
         }
 
         combineRates(rates);
+    }
+
+    /**
+     * Get commerciant by name.
+     * @param commerciant Commerciant's name.
+     * @return The commerciant.
+     */
+    public final Commerciant getCommerciant(final String commerciant) {
+        return commerciantMap.get(commerciant);
+    }
+
+    /**
+     * Adds new associate to the account.
+     * @param account The account.
+     * @param email The associate's user email.
+     * @param type The type of the associate.
+     */
+    public final void addAssociate(final Account account, final String email, final String type) {
+        addAssociate(account, getUser(email), type);
+    }
+
+    /**
+     * Get commerciant by account's IBAN.
+     * @param iban The IBAN.
+     * @return The commerciant.
+     */
+    public final Commerciant getCommerciantByIban(final String iban) {
+        return commerciantIbanMap.get(iban);
+    }
+
+    /**
+     * Adds card to used cards map.
+     * @param card The card to be added.
+     */
+    public final void addUsedCard(final Card card) {
+        usedCards.put(card.getCardNumber(), card);
+    }
+
+    /**
+     * Adds a split payment.
+     * @param payment The payment.
+     */
+    public final void addSplitPayment(final SplitPayment payment) {
+        splitPayments.add(payment);
+    }
+
+    /**
+     * Removes a split payment.
+     * @param payment The payment.
+     */
+    public final void removeSplitPayment(final SplitPayment payment) {
+        splitPayments.remove(payment);
+    }
+
+    /**
+     * Gets the first split payment of an user.
+     * @param user The user.
+     * @param type The type of the payment.
+     * @return The split payment if it exists, NULL
+     * otherwise.
+     */
+    public final SplitPayment getSplitPayment(final User user, final String type) {
+        for (SplitPayment splitPayment : splitPayments) {
+            if (splitPayment.getAccount(user) != null && splitPayment.getType().equals(type)) {
+                return splitPayment;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks if user owns an account.
+     * @param user The user.
+     * @param iban The IBAN of the account.
+     * @return TRUE if the account is owned by the user
+     * FALSE, otherwise.
+     */
+    public final boolean isUsersAccount(final User user, final String iban) {
+        for (Account account : user.getAccounts()) {
+            if (account.getIban().equals(iban)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get a specific used card by card number.
+     * @param card The card's number.
+     * @return The used card.
+     */
+    public final Card getUsedCard(final String card) {
+        return usedCards.get(card);
+    }
+
+    /**
+     * Adds a new associate to an account.
+     * @param account The account.
+     * @param user The new associate.
+     * @param type The type of association.
+     */
+    public final void addAssociate(final Account account, final User user, final String type) {
+        Associates associates = getAssociates(account);
+
+        if (associates == null) {
+            associates = new Associates(account);
+            associates.addAssociate(user, type);
+            associateMap.put(account, associates);
+        } else {
+            associates.addAssociate(user, type);
+        }
+    }
+
+    /**
+     * Checks if a user is associated with an account.
+     * @param account The account.
+     * @param user The user.
+     * @return TRUE if user is associated to the account,
+     * FALSE otherwise.
+     */
+    public final boolean isAssociate(final Account account, final User user) {
+        Associates associates = getAssociates(account);
+
+        if (associates == null) {
+            return false;
+        }
+
+        Associate associate = associates.getAssociate(user);
+        return  associate != null;
+    }
+
+    /**
+     * Gets the associates of an account.
+     * @param account The account.
+     * @return The associates.
+     */
+    public final Associates getAssociates(final Account account) {
+        return associateMap.get(account);
     }
 
     private void combineRates(final List<ExchangeRate> rates) {
@@ -249,14 +421,23 @@ public class Bank {
     }
 
     /**
+     * Gets the user owner of the card.
+     * @param card The card.
+     * @return The user that owns the card.
+     */
+    public final User getUser(final Card card) {
+        return getUser(getAccount(card));
+    }
+
+    /**
      * Delete account of a user.
      * @param user The user.
      * @param account The account.
      */
     public final void deleteAccount(final User user,
                               final Account account) {
-        for (Card card : account.getCards()) {
-            deleteCard(card, account);
+        while (!account.getCards().isEmpty()) {
+            deleteCard(account.getCards().getFirst(), account);
         }
 
         user.getAccounts().remove(account);
